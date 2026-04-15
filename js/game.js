@@ -103,6 +103,7 @@ const Game = {
         this.setupMenuButtons();
         this.setupMobilePanelToggles();
         this.setupLanguageToggle();
+        this.setupSpeedToggle();
         this.setupLeaderboard();
 
         // Initialize tutorial and achievements
@@ -385,6 +386,40 @@ const Game = {
         });
         // Mark the active button on initial load
         if (window.I18N) I18N._refreshToggleUI();
+    },
+
+    setupSpeedToggle() {
+        // Load saved preference
+        const saved = parseFloat(localStorage.getItem('nitrocycle_speed'));
+        if (saved === 0.5 || saved === 1 || saved === 2) {
+            this.speedMultiplier = saved;
+        }
+        // Reflect on UI
+        this._refreshSpeedUI();
+
+        document.querySelectorAll('#speed-toggle .speed-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const v = parseFloat(btn.getAttribute('data-speed'));
+                if (v === 0.5 || v === 1 || v === 2) {
+                    this.speedMultiplier = v;
+                    localStorage.setItem('nitrocycle_speed', String(v));
+                    this._refreshSpeedUI();
+                    if (typeof Audio !== 'undefined' && Audio.click) Audio.click();
+                }
+            });
+            btn.addEventListener('mouseenter', () => {
+                if (typeof Audio !== 'undefined' && Audio.hover) Audio.hover();
+            });
+        });
+    },
+
+    _refreshSpeedUI() {
+        document.querySelectorAll('#speed-toggle .speed-btn').forEach(btn => {
+            const v = parseFloat(btn.getAttribute('data-speed'));
+            btn.classList.toggle('active', v === this.speedMultiplier);
+        });
     },
 
     // ========== LEADERBOARD ==========
