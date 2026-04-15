@@ -1515,12 +1515,17 @@ const Game = {
         this.oxygen = data.oxygen;
         this.temperature = data.temperature;
         this.dayTimer = data.dayTimer || 0;
-        // Speed setting from save — but localStorage preference (set later
-        // by setupSpeedToggle) wins when present, so a returning player
-        // gets the speed they last selected, not the speed they saved at.
-        if (typeof data.speedMultiplier === 'number') {
+        // Speed: localStorage preference wins when present (returning player
+        // gets the speed they last selected). Only fall back to the save's
+        // value if no localStorage preference exists. Also strict-validate
+        // against the same {0.5, 1, 2} whitelist used by setupSpeedToggle
+        // so a corrupt save can't leave us at an unrepresentable speed.
+        if (localStorage.getItem('nitrocycle_speed') === null
+            && (data.speedMultiplier === 0.5 || data.speedMultiplier === 1 || data.speedMultiplier === 2)) {
             this.speedMultiplier = data.speedMultiplier;
         }
+        // Whichever rule won, the pill UI must reflect it.
+        if (typeof this._refreshSpeedUI === 'function') this._refreshSpeedUI();
         this.dayProgress = this.dayTimer / this.dayDuration;
         this.stats = { ...data.stats };
         // Restore milestone + dread state (fall back for older saves without these fields)
