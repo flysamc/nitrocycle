@@ -59,6 +59,7 @@ const STRINGS = {
         'tip.pause': 'Pause game (P)',
         'tip.help': 'Help',
         'tip.leaderboard': 'Leaderboard',
+        'tip.speed': 'Game speed (½× / 1× / 2×)',
         'tip.lang': 'Change language / Sprache wechseln',
 
         // ===== Panels =====
@@ -459,6 +460,7 @@ const STRINGS = {
         'tip.pause': 'Pause (P)',
         'tip.help': 'Hilfe',
         'tip.leaderboard': 'Bestenliste',
+        'tip.speed': 'Spielgeschwindigkeit (½× / 1× / 2×)',
         'tip.lang': 'Change language / Sprache wechseln',
 
         // ===== Panels =====
