@@ -842,7 +842,9 @@ const Game = {
                     return;
                 }
                 this.money -= cost;
-                const reduced = Math.floor(Nitrogen.pools.leached * 0.4);
+                // 40% → 55%: cleanup needs to outpace re-leaching for the
+                // shop button to feel useful (rebalance design 2026-04-15)
+                const reduced = Math.floor(Nitrogen.pools.leached * 0.55);
                 Nitrogen.pools.leached -= reduced;
                 UI.addLog(t('log.cleanWater', { amount: reduced }), 'good');
                 UI.showFeedback(t('feedback.waterCleaned'), t('feedback.waterCleaned.detail', { amount: reduced }));
