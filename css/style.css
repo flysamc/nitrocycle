@@ -291,13 +291,14 @@ body {
 
 /* ========== PAUSE OVERLAY ========== */
 #pause-overlay {
+    /* Compact floating card instead of a fullscreen blackout so the player
+       can still see the game state (canvas, pools, stats) while paused. */
     position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.85);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     z-index: 2000;
+    pointer-events: none; /* only the card itself captures clicks */
 }
 
 #pause-overlay.hidden {
@@ -306,13 +307,21 @@ body {
 
 #pause-content {
     text-align: center;
+    background: var(--bg-dark);
+    border: 3px solid var(--pixel-yellow);
+    padding: 24px 28px;
+    box-shadow:
+        0 6px 0 0 var(--pixel-black),
+        inset -3px -3px 0 0 #0006,
+        inset 3px 3px 0 0 #fff2;
+    pointer-events: auto;
 }
 
 #pause-title {
-    font-size: 24px;
+    font-size: 20px;
     color: var(--pixel-yellow);
     text-shadow: 3px 3px 0 var(--pixel-black);
-    margin-bottom: 32px;
+    margin-bottom: 20px;
     letter-spacing: 4px;
 }
 
@@ -1114,7 +1123,10 @@ body {
     right: 0;
     bottom: 0;
     background: linear-gradient(180deg, #0d1b2a 0%, #1a1c2c 30%, #2d1f0f 70%, #1a3a52 100%);
-    z-index: 500;
+    /* Sits above #pause-overlay (z-index 2000) so that clicking N-CYCLE HELP
+       from the pause menu properly displays the diagram on top of the menu
+       rather than hiding it behind. */
+    z-index: 2500;
     padding: 20px;
     overflow: auto;
     display: flex;
