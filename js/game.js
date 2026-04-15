@@ -885,7 +885,8 @@ const Game = {
                 break;
             }
             case 'emergencyHeal': {
-                const cost = 20 + Math.floor(this.day / 5) * 5;
+                // $20 → $18 base; inflation curve unchanged (+$5 every 5 days)
+                const cost = 18 + Math.floor(this.day / 5) * 5;
                 if (this.money < cost) {
                     UI.showFeedback(t('feedback.notEnoughCoins'), t('feedback.needCost', { cost }));
                     Audio.error();

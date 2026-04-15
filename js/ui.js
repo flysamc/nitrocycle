@@ -470,7 +470,7 @@ const UI = {
             btnCleanWater: 35 + inflate,
             btnScrubAtmo: 40 + inflate,
             btnPlantTree: 50 + inflateTree,
-            btnEmergencyHeal: 20 + inflate
+            btnEmergencyHeal: 18 + inflate
         };
 
         for (const [key, cost] of Object.entries(costs)) {
