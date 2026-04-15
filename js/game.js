@@ -859,7 +859,8 @@ const Game = {
                     return;
                 }
                 this.money -= cost;
-                const reduced = Math.floor(Nitrogen.pools.n2o * 0.4);
+                // 40% → 55%: see CLEAN WATER comment above
+                const reduced = Math.floor(Nitrogen.pools.n2o * 0.55);
                 Nitrogen.pools.n2o -= reduced;
                 this.temperature = Math.max(20, this.temperature - 2);
                 UI.addLog(t('log.scrubAtmo', { amount: reduced }), 'good');
