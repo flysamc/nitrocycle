@@ -311,7 +311,7 @@ const Renderer = {
                     y: py,
                     age: 0,
                     maxAge: 6, // seconds before fully fading
-                    size: a.type === 'cow' ? 5 : a.type === 'sheep' ? 4 : 3
+                    size: a.type === 'cow' ? 7 : a.type === 'sheep' ? 5 : 4
                 });
                 // Add organic nitrogen to the soil — the educational tie-in
                 if (window.Nitrogen && Nitrogen.pools && Nitrogen.maxValues) {
@@ -384,93 +384,93 @@ const Renderer = {
 
     // Pixel sprites are drawn from the animal's FEET (baseY) upwards. dir is
     // +1 (facing right) or -1 (facing left) — we mirror the head/eye on -1.
-    // Sizes are ~2x what they used to be so they're clearly visible at
-    // standard canvas resolutions (~960 wide).
+    // Sizes are ~1.4x larger than the previous pass (2026-04-15) so they're
+    // clearly readable on larger desktop viewports.
     _drawCow(x, baseY, dir, legSwing) {
         const ctx = this.ctx;
-        // Body — white base with brown patches (28x12)
+        // Body — white base with brown patches (40x17)
         ctx.fillStyle = '#f4f4f4';
-        ctx.fillRect(x - 14, baseY - 18, 28, 12);
+        ctx.fillRect(x - 20, baseY - 25, 40, 17);
         // Brown patches
         ctx.fillStyle = '#5d3a1f';
-        ctx.fillRect(x - 10, baseY - 16, 8, 6);
-        ctx.fillRect(x + 4, baseY - 18, 6, 6);
-        ctx.fillRect(x - 4, baseY - 10, 6, 4);
+        ctx.fillRect(x - 14, baseY - 23, 11, 8);
+        ctx.fillRect(x + 6,  baseY - 25, 8, 8);
+        ctx.fillRect(x - 6,  baseY - 14, 8, 6);
         // Legs (4) — front pair anti-phase with back pair for trotting look
         ctx.fillStyle = '#2a2a2a';
-        ctx.fillRect(x - 12, baseY - 6, 4, 6 + legSwing);
-        ctx.fillRect(x + 8,  baseY - 6, 4, 6 + legSwing);
-        ctx.fillRect(x - 6,  baseY - 6, 4, 6 - legSwing);
-        ctx.fillRect(x + 2,  baseY - 6, 4, 6 - legSwing);
-        // Head (8x8) — offset out one body-width
-        const hx = dir > 0 ? x + 12 : x - 20;
+        ctx.fillRect(x - 18, baseY - 8, 6, 8 + legSwing);
+        ctx.fillRect(x + 12, baseY - 8, 6, 8 + legSwing);
+        ctx.fillRect(x - 8,  baseY - 8, 6, 8 - legSwing);
+        ctx.fillRect(x + 4,  baseY - 8, 6, 8 - legSwing);
+        // Head (11x11) — offset out one body-width
+        const hx = dir > 0 ? x + 18 : x - 29;
         ctx.fillStyle = '#f4f4f4';
-        ctx.fillRect(hx, baseY - 16, 8, 8);
+        ctx.fillRect(hx, baseY - 23, 11, 11);
         // Snout (pink)
         ctx.fillStyle = '#e8a3a3';
-        ctx.fillRect(dir > 0 ? hx + 6 : hx, baseY - 12, 2, 4);
+        ctx.fillRect(dir > 0 ? hx + 8 : hx, baseY - 17, 3, 5);
         // Eye
         ctx.fillStyle = '#181425';
-        ctx.fillRect(dir > 0 ? hx + 4 : hx + 2, baseY - 14, 2, 2);
+        ctx.fillRect(dir > 0 ? hx + 6 : hx + 2, baseY - 20, 3, 3);
         // Horns
         ctx.fillStyle = '#e8d59c';
-        ctx.fillRect(hx + 1, baseY - 18, 2, 2);
-        ctx.fillRect(hx + 5, baseY - 18, 2, 2);
+        ctx.fillRect(hx + 1, baseY - 26, 3, 3);
+        ctx.fillRect(hx + 7, baseY - 26, 3, 3);
     },
 
     _drawSheep(x, baseY, dir, legSwing) {
         const ctx = this.ctx;
-        // Fluffy white body — stacked rects for cloud-like silhouette
+        // Fluffy white body — stacked rects for cloud-like silhouette (34x14)
         ctx.fillStyle = '#f4f4f4';
-        ctx.fillRect(x - 12, baseY - 14, 24, 10); // main
-        ctx.fillRect(x - 10, baseY - 17, 20, 4);  // upper fluff
-        ctx.fillRect(x - 8,  baseY - 19, 16, 3);  // top fluff
+        ctx.fillRect(x - 17, baseY - 20, 34, 14); // main
+        ctx.fillRect(x - 14, baseY - 24, 28, 5);  // upper fluff
+        ctx.fillRect(x - 11, baseY - 27, 22, 4);  // top fluff
         // Legs (4)
         ctx.fillStyle = '#2a2a2a';
-        ctx.fillRect(x - 10, baseY - 4, 3, 4 + legSwing);
-        ctx.fillRect(x + 7,  baseY - 4, 3, 4 + legSwing);
-        ctx.fillRect(x - 4,  baseY - 4, 3, 4 - legSwing);
-        ctx.fillRect(x + 1,  baseY - 4, 3, 4 - legSwing);
-        // Head — black face
-        const hx = dir > 0 ? x + 10 : x - 16;
+        ctx.fillRect(x - 14, baseY - 6, 4, 6 + legSwing);
+        ctx.fillRect(x + 10, baseY - 6, 4, 6 + legSwing);
+        ctx.fillRect(x - 6,  baseY - 6, 4, 6 - legSwing);
+        ctx.fillRect(x + 2,  baseY - 6, 4, 6 - legSwing);
+        // Head — black face (8x8)
+        const hx = dir > 0 ? x + 15 : x - 23;
         ctx.fillStyle = '#2a2a2a';
-        ctx.fillRect(hx, baseY - 13, 6, 6);
+        ctx.fillRect(hx, baseY - 18, 8, 8);
         // White muzzle / cheek
         ctx.fillStyle = '#f4f4f4';
-        ctx.fillRect(dir > 0 ? hx + 4 : hx, baseY - 9, 2, 2);
+        ctx.fillRect(dir > 0 ? hx + 5 : hx, baseY - 13, 3, 3);
         // Eye
-        ctx.fillRect(dir > 0 ? hx + 4 : hx, baseY - 11, 2, 2);
+        ctx.fillRect(dir > 0 ? hx + 5 : hx, baseY - 16, 3, 3);
         ctx.fillStyle = '#181425';
-        ctx.fillRect(dir > 0 ? hx + 4 : hx + 1, baseY - 11, 1, 1);
+        ctx.fillRect(dir > 0 ? hx + 5 : hx + 2, baseY - 16, 2, 2);
     },
 
     _drawChicken(x, baseY, dir, legSwing) {
         const ctx = this.ctx;
-        // Body — small white blob (~12x8)
+        // Body — small white blob (17x11)
         ctx.fillStyle = '#f4f4f4';
-        ctx.fillRect(x - 6, baseY - 12, 12, 8);
+        ctx.fillRect(x - 8, baseY - 17, 17, 11);
         // Tail feather pointing back
-        ctx.fillRect(dir > 0 ? x - 8 : x + 6, baseY - 12, 2, 4);
+        ctx.fillRect(dir > 0 ? x - 11 : x + 9, baseY - 17, 3, 6);
         // Wing detail
         ctx.fillStyle = '#dcdcdc';
-        ctx.fillRect(x - 4, baseY - 9, 6, 3);
+        ctx.fillRect(x - 5, baseY - 13, 9, 4);
         // Legs — yellow, prominent leg-swing for chicken-walk feel
         ctx.fillStyle = '#feae34';
-        ctx.fillRect(x - 3, baseY - 4, 2, 4 + legSwing);
-        ctx.fillRect(x + 1, baseY - 4, 2, 4 - legSwing);
-        // Head (4x4)
-        const hx = dir > 0 ? x + 4 : x - 8;
+        ctx.fillRect(x - 5, baseY - 6, 3, 6 + legSwing);
+        ctx.fillRect(x + 2, baseY - 6, 3, 6 - legSwing);
+        // Head (6x6)
+        const hx = dir > 0 ? x + 6 : x - 12;
         ctx.fillStyle = '#f4f4f4';
-        ctx.fillRect(hx, baseY - 16, 4, 4);
+        ctx.fillRect(hx, baseY - 23, 6, 6);
         // Comb (red, on top)
         ctx.fillStyle = '#e43b44';
-        ctx.fillRect(hx + 1, baseY - 18, 3, 2);
+        ctx.fillRect(hx + 1, baseY - 26, 4, 3);
         // Beak (yellow, pointing in walking direction)
         ctx.fillStyle = '#feae34';
-        ctx.fillRect(dir > 0 ? hx + 4 : hx - 2, baseY - 14, 2, 2);
+        ctx.fillRect(dir > 0 ? hx + 6 : hx - 3, baseY - 20, 3, 3);
         // Eye
         ctx.fillStyle = '#181425';
-        ctx.fillRect(dir > 0 ? hx + 2 : hx + 1, baseY - 15, 1, 1);
+        ctx.fillRect(dir > 0 ? hx + 3 : hx + 1, baseY - 22, 2, 2);
     },
 
     generateMycelium() {
