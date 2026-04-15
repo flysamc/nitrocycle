@@ -148,6 +148,9 @@ const Game = {
     startPlaying() {
         // Start game loop
         this.state = 'playing';
+        // Reset per-run leaderboard submission state so a new run can
+        // submit a fresh score even if a previous run already submitted.
+        this._alreadySubmitted = false;
         this.startLoop();
 
         // Initial update
@@ -370,24 +373,40 @@ const Game = {
         const menuBtn = document.getElementById('menu-leaderboard');
         const overBtn = document.getElementById('btn-view-leaderboard');
         const saveBtn = document.getElementById('btn-save-score');
+        const headerBtn = document.getElementById('btn-leaderboard');
+        const claimBtn = document.getElementById('lb-claim-top');
         const closeBtn = document.getElementById('lb-close');
         const tabs = document.querySelectorAll('#leaderboard-modal .lb-tab');
         const submitBtn = document.getElementById('name-submit');
         const cancelBtn = document.getElementById('name-cancel');
         const nameInput = document.getElementById('name-input');
 
-        if (menuBtn) menuBtn.addEventListener('click', () => {
+        // Shared handler guard
+        const safeHandle = (fn) => (e) => {
+            if (e) { e.preventDefault(); e.stopPropagation(); }
+            fn();
+        };
+
+        if (menuBtn) menuBtn.addEventListener('click', safeHandle(() => {
             this.openLeaderboard(this.difficulty || 'normal');
             Audio.click();
-        });
-        if (overBtn) overBtn.addEventListener('click', () => {
+        }));
+        if (overBtn) overBtn.addEventListener('click', safeHandle(() => {
             this.openLeaderboard(this.difficulty || 'normal');
             Audio.click();
-        });
-        if (saveBtn) saveBtn.addEventListener('click', () => {
+        }));
+        if (headerBtn) headerBtn.addEventListener('click', safeHandle(() => {
+            this.openLeaderboard(this.difficulty || 'normal');
+            Audio.click();
+        }));
+        if (saveBtn) saveBtn.addEventListener('click', safeHandle(() => {
             this.openNameModal();
             Audio.click();
-        });
+        }));
+        if (claimBtn) claimBtn.addEventListener('click', safeHandle(() => {
+            this.openNameModal();
+            Audio.click();
+        }));
         if (closeBtn) closeBtn.addEventListener('click', () => this.closeLeaderboard());
         tabs.forEach(tab => {
             tab.addEventListener('click', () => {
@@ -436,6 +455,8 @@ const Game = {
         const status = document.getElementById('lb-status');
         const table = document.getElementById('lb-table');
         const tbody = document.getElementById('lb-tbody');
+        const footer = document.getElementById('lb-footer');
+        const footerNote = document.getElementById('lb-footer-note');
         if (!status || !table || !tbody) return;
 
         // Reset to loading state
@@ -443,35 +464,72 @@ const Game = {
         status.classList.remove('hidden');
         status.textContent = t('lb.loading');
         table.classList.add('hidden');
+        if (footer) footer.classList.add('hidden');
         tbody.innerHTML = '';
+
+        // Remember which tab we're showing — the claim button uses this to
+        // decide which difficulty to submit to (may differ from the current
+        // game's difficulty, e.g. player is viewing HARD board during a
+        // NORMAL run — we still submit to the run's actual difficulty).
+        this._currentLbTab = diff;
 
         try {
             const data = await Leaderboard.fetch(diff);
             const entries = data.entries || [];
             if (entries.length === 0) {
                 status.textContent = t('lb.empty');
-                return;
+            } else {
+                entries.forEach((e, i) => {
+                    const tr = document.createElement('tr');
+                    if (highlightTimestamp && e.timestamp === highlightTimestamp) {
+                        tr.classList.add('you');
+                    }
+                    const escape = (s) => String(s).replace(/[&<>"']/g, c => (
+                        { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+                    ));
+                    tr.innerHTML =
+                        `<td class="lb-col-rank">${i + 1}</td>` +
+                        `<td class="lb-col-name">${escape(e.name)}</td>` +
+                        `<td class="lb-col-score">${e.score}</td>` +
+                        `<td class="lb-col-days">${e.days}</td>`;
+                    tbody.appendChild(tr);
+                });
+                status.classList.add('hidden');
+                table.classList.remove('hidden');
             }
-            entries.forEach((e, i) => {
-                const tr = document.createElement('tr');
-                if (highlightTimestamp && e.timestamp === highlightTimestamp) {
-                    tr.classList.add('you');
+
+            // --- Eligibility for "Claim top spot" ---
+            // Show the claim footer when:
+            //   - the player has played (score > 0)
+            //   - the viewed tab matches the current run's difficulty
+            //     (you can only submit to the mode you're actually playing)
+            //   - AND (board is empty OR player's score > current #1 score)
+            // The save-score button on the game-over screen already covers
+            // the win flow, so we also hide the claim button after a
+            // successful submit by tracking an _alreadySubmitted flag.
+            if (footer && footerNote) {
+                const playerScore = this.score || 0;
+                const playerDiff = this.difficulty || 'normal';
+                const topEntry = entries[0] || null;
+                const beatsTop = !topEntry || playerScore > topEntry.score;
+                const eligible = playerScore > 0
+                    && diff === playerDiff
+                    && beatsTop
+                    && !this._alreadySubmitted;
+
+                if (eligible) {
+                    footerNote.textContent = topEntry
+                        ? t('lb.beatsTop', { score: playerScore })
+                        : t('lb.beFirst');
+                    footer.classList.remove('hidden');
+                } else {
+                    footer.classList.add('hidden');
                 }
-                const escape = (s) => String(s).replace(/[&<>"']/g, c => (
-                    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
-                ));
-                tr.innerHTML =
-                    `<td class="lb-col-rank">${i + 1}</td>` +
-                    `<td class="lb-col-name">${escape(e.name)}</td>` +
-                    `<td class="lb-col-score">${e.score}</td>` +
-                    `<td class="lb-col-days">${e.days}</td>`;
-                tbody.appendChild(tr);
-            });
-            status.classList.add('hidden');
-            table.classList.remove('hidden');
+            }
         } catch (err) {
             status.classList.add('error');
             status.textContent = err.offline ? t('lb.error.offline') : t('lb.error.network');
+            if (footer) footer.classList.add('hidden');
         }
     },
 
@@ -524,6 +582,8 @@ const Game = {
             });
             Audio.goodEvent();
             this.closeNameModal();
+            // Mark this run as submitted so the claim-top-spot footer hides
+            this._alreadySubmitted = true;
             // Hide the save-score button so they can't re-submit
             const saveBtn = document.getElementById('btn-save-score');
             if (saveBtn) saveBtn.classList.add('hidden');

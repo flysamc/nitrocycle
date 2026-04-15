@@ -80,6 +80,7 @@
                 <button class="icon-btn mobile-only" id="btn-toggle-status" data-i18n="header.status" data-i18n-title="tip.toggleStatus" title="Show/hide plant status">STATUS</button>
                 <button class="icon-btn" id="btn-sound" data-i18n="header.sfx" data-i18n-title="tip.toggleSound" title="Toggle Sound">SFX</button>
                 <button class="icon-btn" id="btn-music" data-i18n="header.bgm" data-i18n-title="tip.toggleMusic" title="Toggle Music">BGM</button>
+                <button class="icon-btn" id="btn-leaderboard" data-i18n-title="tip.leaderboard" title="Leaderboard">🏆</button>
                 <button class="icon-btn pause-btn" id="btn-pause" data-i18n-tooltip="tip.pause" data-tooltip="Pause game (P)">❚❚</button>
                 <button class="icon-btn" id="btn-help" data-i18n-title="tip.help" title="Help">?</button>
             </div>
@@ -667,6 +668,12 @@
                         </thead>
                         <tbody id="lb-tbody"></tbody>
                     </table>
+                </div>
+                <!-- Shown when the current player's score qualifies for #1
+                     (board empty OR beats current top on the active tab). -->
+                <div class="lb-footer hidden" id="lb-footer">
+                    <div class="lb-footer-note" id="lb-footer-note" data-i18n="lb.beFirst">Be the first to claim this spot!</div>
+                    <button id="lb-claim-top" class="name-modal-btn primary" data-i18n="lb.claimTopSpot">🏆 CLAIM TOP SPOT</button>
                 </div>
             </div>
         </div>

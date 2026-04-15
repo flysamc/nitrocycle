@@ -2087,6 +2087,26 @@ body {
     margin-top: 8px;
 }
 
+/* Footer inside the leaderboard modal — shown only when the current
+   player's score qualifies for #1 on the active tab. */
+.lb-footer {
+    padding: 14px 20px 18px;
+    border-top: 3px solid var(--pixel-black);
+    background: rgba(254, 174, 52, 0.08);
+    text-align: center;
+}
+.lb-footer.hidden { display: none; }
+.lb-footer-note {
+    font-size: 8px;
+    color: var(--pixel-yellow);
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+#lb-claim-top {
+    font-size: 10px;
+    padding: 10px 16px;
+}
+
 #btn-save-score {
     background: var(--pixel-yellow);
     color: var(--pixel-black);

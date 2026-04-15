@@ -58,6 +58,7 @@ const STRINGS = {
         'tip.toggleMusic': 'Toggle Music',
         'tip.pause': 'Pause game (P)',
         'tip.help': 'Help',
+        'tip.leaderboard': 'Leaderboard',
         'tip.lang': 'Change language / Sprache wechseln',
 
         // ===== Panels =====
@@ -397,6 +398,9 @@ const STRINGS = {
         'lb.empty': 'No scores yet — be the first!',
         'lb.error.network': 'Could not load leaderboard.',
         'lb.error.offline': 'Leaderboard is only available on the live site (deploy to view).',
+        'lb.beFirst': 'No entries yet — claim the top spot!',
+        'lb.beatsTop': 'Your score ({score}) beats #1! Claim the top spot?',
+        'lb.claimTopSpot': '🏆 CLAIM TOP SPOT',
 
         // ===== Log messages =====
         'log.gameStarted': 'GAME STARTED!',
@@ -453,6 +457,7 @@ const STRINGS = {
         'tip.toggleMusic': 'Musik ein/aus',
         'tip.pause': 'Pause (P)',
         'tip.help': 'Hilfe',
+        'tip.leaderboard': 'Bestenliste',
         'tip.lang': 'Change language / Sprache wechseln',
 
         // ===== Panels =====
@@ -792,6 +797,9 @@ const STRINGS = {
         'lb.empty': 'Noch keine Einträge – sei die/der Erste!',
         'lb.error.network': 'Konnte Bestenliste nicht laden.',
         'lb.error.offline': 'Bestenliste nur auf der Live-Seite verfügbar (deployen zum Anzeigen).',
+        'lb.beFirst': 'Noch keine Einträge – hol dir Platz 1!',
+        'lb.beatsTop': 'Dein Score ({score}) schlägt Platz 1! Übernehmen?',
+        'lb.claimTopSpot': '🏆 PLATZ 1 HOLEN',
 
         // ===== Log messages =====
         'log.gameStarted': 'SPIEL GESTARTET!',
