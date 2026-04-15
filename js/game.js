@@ -14,6 +14,11 @@ const Game = {
     dayProgress: 0,
     lastFrameTime: 0,
 
+    // Global time scaling (½× / 1× / 2×). Multiplies delta in animate(),
+    // so day timer, cooldowns, and animations all slow/speed together.
+    // Persisted to localStorage as `nitrocycle_speed`.
+    speedMultiplier: 1.0,
+
     // Action cooldowns (in ms) - longer = more strategic
     cooldowns: {
         fix:       { duration: 4500, remaining: 0 },
@@ -919,6 +924,9 @@ const Game = {
             // Cap deltaTime to prevent huge jumps on tab switch
             if (delta > 1000) delta = 1000;
 
+            // Apply global speed multiplier — does NOT give extra actions per
+            // day because cooldowns scale with the same delta (cheat-resistant).
+            delta *= (this.speedMultiplier || 1);
             // Expose for renderer (farm-animal animation uses dt)
             this._lastFrameDelta = delta;
 
