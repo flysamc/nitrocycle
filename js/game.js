@@ -1200,7 +1200,8 @@ const Game = {
         this.dayTimer = 0;
         this.dayProgress = 0;
         this.score += 3;
-        this.money += 3;  // Less income = harder choices
+        // Bumped from +$3 → +$4 to reduce mid-game money pressure (rebalance design 2026-04-15)
+        this.money += 4;
 
         UI.addLog(t('log.newDay', { day: this.day }));
         this.updateUI();
