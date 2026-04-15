@@ -66,6 +66,45 @@
 }
 
 
+/* ============= SPEED TOGGLE (½× / 1× / 2×) ============= */
+#speed-toggle {
+    display: inline-flex;
+    gap: 2px;
+    background: #181425;
+    padding: 2px;
+    border: 2px solid #f4f4f4;
+    box-shadow: 0 3px 0 0 #000;
+    font-family: 'Press Start 2P', monospace;
+    align-items: center;
+}
+
+#speed-toggle .speed-btn {
+    font-family: inherit;
+    font-size: 8px;
+    line-height: 1;
+    padding: 4px 6px;
+    background: transparent;
+    color: #f4f4f4;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background 0.1s, color 0.1s;
+}
+
+#speed-toggle .speed-btn:hover {
+    background: #3b5dc9;
+    color: #feae34;
+}
+
+#speed-toggle .speed-btn.active {
+    background: #38b764;
+    color: #181425;
+    border-color: #a7f070;
+}
+
+@media (max-width: 480px) {
+    #speed-toggle .speed-btn { font-size: 7px; padding: 3px 4px; }
+}
+
 :root {
     /* Retro color palette */
     --bg-dark: #1a1c2c;
