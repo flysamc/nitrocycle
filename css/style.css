@@ -952,6 +952,9 @@ body {
         inset 4px 4px 0 0 #fff3,
         0 4px 0 0 var(--pixel-black);
     transition: transform 0.1s;
+    /* Make PLAY AGAIN span the full row so SAVE/LEADERBOARD
+       wrap onto a secondary row beneath it. */
+    flex-basis: 100%;
 }
 
 #btn-restart:hover {
@@ -1194,9 +1197,10 @@ body {
 }
 
 .cycle-subtitle {
-    font-size: 7px;
+    font-size: 9px;
     color: var(--pixel-cyan);
     margin-top: 4px;
+    line-height: 1.5;
 }
 
 .cycle-canvas {
@@ -1219,11 +1223,11 @@ body {
 
 .zone-label {
     position: absolute;
-    top: -8px;
+    top: -10px;
     left: 10px;
     background: var(--bg-dark);
     padding: 0 6px;
-    font-size: 7px;
+    font-size: 9px;
     color: var(--pixel-white);
 }
 
@@ -1260,15 +1264,16 @@ body {
 }
 
 .node-desc {
-    font-size: 6px;
+    font-size: 8px;
     color: #888;
-    margin-top: 2px;
+    margin-top: 4px;
+    line-height: 1.4;
 }
 
 .node-tag {
-    font-size: 5px;
-    padding: 2px 4px;
-    margin-top: 4px;
+    font-size: 7px;
+    padding: 3px 5px;
+    margin-top: 5px;
     display: inline-block;
 }
 
@@ -1365,9 +1370,9 @@ body {
 }
 
 .bacteria-name {
-    font-size: 6px;
+    font-size: 8px;
     color: var(--pixel-cyan);
-    margin-top: 2px;
+    margin-top: 3px;
 }
 
 /* Soil cycle row */
@@ -1397,16 +1402,17 @@ body {
 }
 
 .arrow-text {
-    font-size: 5px;
+    font-size: 8px;
     color: var(--pixel-cyan);
+    margin-top: 2px;
 }
 
 .process-label {
     text-align: center;
-    font-size: 6px;
+    font-size: 9px;
     color: var(--pixel-orange);
     margin-top: 8px;
-    padding: 4px;
+    padding: 6px;
     border-top: 1px dashed var(--pixel-orange);
 }
 
@@ -1467,22 +1473,23 @@ body {
 }
 
 .v-arrow-text {
-    font-size: 5px;
+    font-size: 8px;
     color: var(--pixel-cyan);
 }
 
 .curved-arrow-label {
-    font-size: 6px;
+    font-size: 8px;
     color: var(--pixel-brown-light);
     text-align: center;
     border: 1px solid var(--pixel-brown-light);
-    padding: 4px;
+    padding: 5px;
     margin-top: 4px;
+    line-height: 1.4;
 }
 
 .bacteria-small {
     display: block;
-    font-size: 5px;
+    font-size: 8px;
     color: var(--pixel-cyan);
 }
 
@@ -1492,7 +1499,7 @@ body {
 }
 
 .loss-title {
-    font-size: 8px;
+    font-size: 10px;
     color: var(--pixel-red);
     text-align: center;
     margin-bottom: 8px;
@@ -1504,40 +1511,42 @@ body {
     flex-direction: column;
     align-items: center;
     gap: 4px;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
 .loss-arrow {
-    font-size: 6px;
+    font-size: 8px;
     color: var(--pixel-red);
+    line-height: 1.4;
 }
 
 .cycle-node.small {
-    padding: 6px 8px;
+    padding: 7px 10px;
 }
 
 .cycle-node.small .node-icon {
-    font-size: 12px;
+    font-size: 14px;
 }
 
 .cycle-node.small .node-name {
-    font-size: 8px;
+    font-size: 9px;
 }
 
 .cycle-node.small .node-desc {
-    font-size: 5px;
+    font-size: 7px;
+    line-height: 1.4;
 }
 
 .cycle-node.small .node-tag {
-    font-size: 4px;
+    font-size: 7px;
 }
 
 /* Decompose label */
 .decompose-label {
-    font-size: 7px;
+    font-size: 9px;
     color: var(--pixel-brown-light);
     background: var(--pixel-black);
-    padding: 2px 6px;
+    padding: 4px 8px;
     border: 1px solid var(--pixel-brown-light);
 }
 
@@ -1557,13 +1566,14 @@ body {
 }
 
 .uptake-label {
-    font-size: 7px;
+    font-size: 9px;
     color: var(--pixel-green);
 }
 
 .uptake-text {
-    font-size: 5px;
+    font-size: 8px;
     color: var(--pixel-cyan);
+    margin-top: 3px;
 }
 
 /* Center process - Denitrification */
@@ -1578,26 +1588,26 @@ body {
 }
 
 .denitrify-title {
-    font-size: 8px;
+    font-size: 10px;
     color: var(--pixel-purple);
-    margin-bottom: 4px;
+    margin-bottom: 6px;
 }
 
 .denitrify-desc {
-    font-size: 6px;
+    font-size: 9px;
     color: var(--pixel-white);
-    margin-bottom: 4px;
+    margin-bottom: 6px;
 }
 
 .denitrify-bacteria {
-    font-size: 6px;
+    font-size: 8px;
     color: var(--pixel-cyan);
 }
 
 .denitrify-condition {
-    font-size: 5px;
+    font-size: 8px;
     color: var(--pixel-orange);
-    margin-top: 2px;
+    margin-top: 4px;
 }
 
 .denitrify-arrows {
@@ -1625,7 +1635,7 @@ body {
 }
 
 .good-path .path-label {
-    font-size: 6px;
+    font-size: 8px;
     color: var(--pixel-green-light);
 }
 
@@ -1640,7 +1650,7 @@ body {
 }
 
 .bad-path .path-label {
-    font-size: 6px;
+    font-size: 8px;
     color: var(--pixel-red);
 }
 
@@ -1678,9 +1688,9 @@ body {
 }
 
 .return-label {
-    font-size: 6px;
+    font-size: 9px;
     color: var(--pixel-blue);
-    margin-top: 2px;
+    margin-top: 4px;
 }
 
 /* Legend section */
@@ -1692,29 +1702,31 @@ body {
 }
 
 .legend-title {
-    font-size: 7px;
+    font-size: 10px;
     color: var(--pixel-purple);
     text-align: center;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
     border-bottom: 1px dashed var(--pixel-purple);
-    padding-bottom: 4px;
+    padding-bottom: 6px;
 }
 
 .legend-items {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 4px;
+    gap: 8px;
 }
 
 .legend-item {
     display: flex;
     align-items: center;
-    gap: 4px;
-    font-size: 5px;
+    gap: 6px;
+    font-size: 8px;
+    line-height: 1.5;
 }
 
 .legend-icon {
-    font-size: 10px;
+    font-size: 14px;
+    flex-shrink: 0;
 }
 
 .legend-icon.rhizobium { filter: hue-rotate(120deg); }
@@ -1739,19 +1751,20 @@ body {
 }
 
 .tips-title {
-    font-size: 7px;
+    font-size: 10px;
     color: var(--pixel-yellow);
     text-align: center;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
     border-bottom: 1px dashed var(--pixel-yellow);
-    padding-bottom: 4px;
+    padding-bottom: 6px;
 }
 
 .tip {
-    font-size: 6px;
+    font-size: 9px;
     color: var(--pixel-white);
-    margin-bottom: 4px;
-    padding: 2px 4px;
+    margin-bottom: 6px;
+    padding: 4px 6px;
+    line-height: 1.6;
 }
 
 .tip strong {
@@ -2146,10 +2159,47 @@ body {
     padding: 10px 16px;
 }
 
-#btn-save-score {
-    background: var(--pixel-yellow);
+/* Secondary game-over buttons — match PLAY AGAIN's pixel-art
+   treatment but at a smaller size so PLAY AGAIN remains the primary CTA. */
+#btn-save-score,
+#btn-view-leaderboard {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    padding: 12px 20px;
     color: var(--pixel-black);
-    border: 3px solid #fff;
+    border: 3px solid var(--pixel-black);
+    cursor: pointer;
+    box-shadow:
+        inset -3px -3px 0 0 #0006,
+        inset 3px 3px 0 0 #fff4,
+        0 3px 0 0 var(--pixel-black);
+    transition: transform 0.1s;
+}
+
+#btn-save-score {
+    background: linear-gradient(180deg, var(--pixel-yellow) 0%, #c08a1e 100%);
+}
+
+#btn-view-leaderboard {
+    background: linear-gradient(180deg, var(--pixel-cyan) 0%, #2a9aa8 100%);
+}
+
+#btn-save-score:hover,
+#btn-view-leaderboard:hover {
+    transform: translateY(-2px);
+    box-shadow:
+        inset -3px -3px 0 0 #0006,
+        inset 3px 3px 0 0 #fff4,
+        0 5px 0 0 var(--pixel-black);
+}
+
+#btn-save-score:active,
+#btn-view-leaderboard:active {
+    transform: translateY(2px);
+    box-shadow:
+        inset -3px -3px 0 0 #0006,
+        inset 3px 3px 0 0 #fff4,
+        0 1px 0 0 var(--pixel-black);
 }
 
 @media (max-width: 480px) {
