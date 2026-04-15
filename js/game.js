@@ -106,6 +106,25 @@ const Game = {
 
         // Load colorblind preference
         this.loadColorblindPref();
+
+        // Move overlay modals out of #game-container so their z-index
+        // resolves in the root stacking context. Otherwise they can't
+        // render above #difficulty-select on the start screen — the
+        // fixed-position #game-container creates its own stacking context
+        // that caps anything inside it (cycle diagram, leaderboard, etc.)
+        // at the container's own z-index (auto=0), losing to the menu's
+        // z-index 1500.
+        this._promoteModalsToBody();
+    },
+
+    _promoteModalsToBody() {
+        ['cycle-diagram', 'name-modal', 'leaderboard-modal', 'overlay', 'info-popup', 'pause-overlay', 'feedback', 'tutorial-overlay', 'floating-nums', 'tooltip']
+            .forEach(id => {
+                const el = document.getElementById(id);
+                if (el && el.parentElement !== document.body) {
+                    document.body.appendChild(el);
+                }
+            });
     },
 
     showDifficultySelect() {
