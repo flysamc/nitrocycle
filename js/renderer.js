@@ -326,8 +326,10 @@ const Renderer = {
                     }
                     // Each manure pile also drops a single coin — light passive
                     // income to ease money pressure without trivializing the
-                    // shop (rebalance design 2026-04-15).
-                    if (window.Game) {
+                    // shop (rebalance design 2026-04-15). Gated on
+                    // state==='playing' so coins don't tick up while the
+                    // pause menu, tutorial, or cycle diagram is open.
+                    if (window.Game && Game.state === 'playing') {
                         Game.money = (Game.money || 0) + 1;
                     }
                 }
