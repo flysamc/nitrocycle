@@ -115,9 +115,9 @@ const STRINGS = {
         // ===== Shop =====
         'shop.label': 'SHOP',
         'shop.cleanWater.name': 'CLEAN WATER',
-        'shop.cleanWater.tip': 'Reduce leached NO₃⁻ by 40%. Cleans polluted groundwater.',
+        'shop.cleanWater.tip': 'Reduce leached NO₃⁻ by 55%. Cleans polluted groundwater.',
         'shop.scrubAtmo.name': 'SCRUB ATMO',
-        'shop.scrubAtmo.tip': 'Reduce N₂O by 40% and cool temperature by 2°C.',
+        'shop.scrubAtmo.tip': 'Reduce N₂O by 55% and cool temperature by 2°C.',
         'shop.plantTree.name': 'PLANT TREE',
         'shop.plantTree.tip': 'Plant a companion tree. +10 HP, +15 total nitrogen absorbed.',
         'shop.heal.name': 'HEAL',
@@ -515,9 +515,9 @@ const STRINGS = {
         // ===== Shop =====
         'shop.label': 'SHOP',
         'shop.cleanWater.name': 'WASSER KLAR',
-        'shop.cleanWater.tip': 'Senkt ausgewaschenes NO₃⁻ um 40%. Reinigt das Grundwasser.',
+        'shop.cleanWater.tip': 'Senkt ausgewaschenes NO₃⁻ um 55%. Reinigt das Grundwasser.',
         'shop.scrubAtmo.name': 'LUFT KLAR',
-        'shop.scrubAtmo.tip': 'Senkt N₂O um 40% und kühlt um 2°C.',
+        'shop.scrubAtmo.tip': 'Senkt N₂O um 55% und kühlt um 2°C.',
         'shop.plantTree.name': 'BAUM PFLANZEN',
         'shop.plantTree.tip': 'Pflanze einen zweiten Baum. +10 HP, +15 aufgenommener Stickstoff.',
         'shop.heal.name': 'HEILEN',
