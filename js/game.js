@@ -409,9 +409,6 @@ const Game = {
                     if (typeof Audio !== 'undefined' && Audio.click) Audio.click();
                 }
             });
-            btn.addEventListener('mouseenter', () => {
-                if (typeof Audio !== 'undefined' && Audio.hover) Audio.hover();
-            });
         });
     },
 
