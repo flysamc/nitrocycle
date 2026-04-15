@@ -105,6 +105,100 @@ const Audio = {
         this.playTone(800, 0.05, 'square', 0.5);
     },
 
+    // ============ FARM ANIMAL SOUNDS ============
+    // Kept quiet (volumeMod ~0.25) since they fire in the background on a
+    // timer — we don't want them to dominate the ambient audio.
+
+    // Cow: low descending "moo" (~0.7s)
+    moo() {
+        if (!this.enabled || !this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        const now = this.ctx.currentTime;
+        osc.frequency.setValueAtTime(140, now);
+        osc.frequency.exponentialRampToValueAtTime(90, now + 0.5);
+        const vol = this.volume * 0.22;
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.exponentialRampToValueAtTime(vol, now + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.7);
+    },
+
+    // Sheep: mid-frequency wavery "baa" (~0.4s)
+    baa() {
+        if (!this.enabled || !this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const lfo = this.ctx.createOscillator();
+        const lfoGain = this.ctx.createGain();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        const now = this.ctx.currentTime;
+        osc.frequency.setValueAtTime(340, now);
+        osc.frequency.exponentialRampToValueAtTime(260, now + 0.35);
+        // Vibrato
+        lfo.frequency.setValueAtTime(18, now);
+        lfoGain.gain.setValueAtTime(12, now);
+        lfo.connect(lfoGain);
+        lfoGain.connect(osc.frequency);
+        const vol = this.volume * 0.2;
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.exponentialRampToValueAtTime(vol, now + 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now); lfo.start(now);
+        osc.stop(now + 0.4); lfo.stop(now + 0.4);
+    },
+
+    // Chicken: short sharp "cluck" (~0.1s)
+    cluck() {
+        if (!this.enabled || !this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'square';
+        const now = this.ctx.currentTime;
+        osc.frequency.setValueAtTime(700, now);
+        osc.frequency.exponentialRampToValueAtTime(450, now + 0.08);
+        const vol = this.volume * 0.18;
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.exponentialRampToValueAtTime(vol, now + 0.015);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.1);
+    },
+
+    // Wrapper called by the renderer — dispatches by animal type
+    farmCall(type) {
+        if (type === 'cow') this.moo();
+        else if (type === 'sheep') this.baa();
+        else if (type === 'chicken') this.cluck();
+    },
+
+    // Very soft "plop" for manure dropping — subtle so it doesn't overwhelm
+    farmPoop() {
+        if (!this.enabled || !this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        const now = this.ctx.currentTime;
+        osc.frequency.setValueAtTime(200, now);
+        osc.frequency.exponentialRampToValueAtTime(80, now + 0.08);
+        const vol = this.volume * 0.12;
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.exponentialRampToValueAtTime(vol, now + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.12);
+    },
+
     // Button hover
     hover() {
         this.playTone(400, 0.03, 'square', 0.3);

@@ -331,6 +331,7 @@ const STRINGS = {
         'float.safeNo3': 'Safe! -{amount} NO₃⁻',
         'float.crisisAverted': 'CRISIS AVERTED! +$2',
         'float.bonusMoney': '+${amount} BONUS!',
+        'farm.manure.float': '+{amount} organic (manure)',
 
         'feedback.notEnoughCoins': 'NOT ENOUGH COINS!',
         'feedback.needCost': 'Need ${cost}',
@@ -730,6 +731,7 @@ const STRINGS = {
         'float.safeNo3': 'Sicher! -{amount} NO₃⁻',
         'float.crisisAverted': 'KRISE ABGEWENDET! +$2',
         'float.bonusMoney': '+${amount} BONUS!',
+        'farm.manure.float': '+{amount} organisch (Mist)',
 
         'feedback.notEnoughCoins': 'NICHT GENUG MÜNZEN!',
         'feedback.needCost': 'Brauche ${cost}',

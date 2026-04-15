@@ -915,6 +915,9 @@ const Game = {
             // Cap deltaTime to prevent huge jumps on tab switch
             if (delta > 1000) delta = 1000;
 
+            // Expose for renderer (farm-animal animation uses dt)
+            this._lastFrameDelta = delta;
+
             if (this.state === 'playing') {
                 // Advance day timer
                 this.dayTimer += delta;

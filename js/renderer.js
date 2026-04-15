@@ -67,6 +67,14 @@ const Renderer = {
         fireflies: []
     },
 
+    // Surface-walking farm animals. Each one wanders left/right on the
+    // grass, occasionally pauses, drops manure (which adds Organic N to
+    // the soil), and very rarely vocalizes. Educational tie-in:
+    // animal poop → organic matter → ammonification → NH₄⁺.
+    farmAnimals: [],
+    // Manure piles dropped on the grass. Fade out over a few seconds.
+    manurePiles: [],
+
     // Particle system
     particles: [],
 
@@ -94,6 +102,9 @@ const Renderer = {
 
         // Generate creatures
         this.generateCreatures();
+
+        // Generate surface farm animals
+        this.generateFarmAnimals();
 
         return true;
     },
@@ -224,6 +235,234 @@ const Renderer = {
                 glowSpeed: 0.03 + Math.random() * 0.02
             });
         }
+    },
+
+    // ============ FARM ANIMALS ============
+    // Surface-walking pixel-art farm animals. Each one wanders the grass,
+    // pauses sometimes, and periodically drops manure (which adds Organic N
+    // to the soil — a real piece of the nitrogen cycle).
+    generateFarmAnimals() {
+        this.farmAnimals = [];
+        this.manurePiles = [];
+        // Spawn list — keep it light so it doesn't crowd the canvas
+        const roster = [
+            { type: 'cow',     count: 2, baseSpeed: 0.00012 },
+            { type: 'sheep',   count: 2, baseSpeed: 0.00018 },
+            { type: 'chicken', count: 1, baseSpeed: 0.00030 }
+        ];
+        roster.forEach(r => {
+            for (let i = 0; i < r.count; i++) {
+                this.farmAnimals.push({
+                    type: r.type,
+                    x: Math.random(),
+                    dir: Math.random() < 0.5 ? -1 : 1,
+                    baseSpeed: r.baseSpeed,
+                    state: 'walking',           // 'walking' | 'idle'
+                    stateTimer: 2 + Math.random() * 4,    // seconds in state
+                    legPhase: Math.random() * Math.PI * 2,
+                    // First poop after 8-20s — staggers so they don't all
+                    // poop at once on game start.
+                    poopTimer: 8 + Math.random() * 12,
+                    // First vocalization after 15-30s
+                    vocalTimer: 15 + Math.random() * 15
+                });
+            }
+        });
+    },
+
+    /**
+     * Updates farm animals (walking, state machine, poop, sound) and the
+     * fading manure piles. Called once per render frame from drawFarmAnimals.
+     * `dt` is seconds since last frame.
+     */
+    _updateFarmAnimals(dt) {
+        // --- update animals ---
+        this.farmAnimals.forEach(a => {
+            // State machine: walk for a bit, idle for a bit
+            a.stateTimer -= dt;
+            if (a.stateTimer <= 0) {
+                if (a.state === 'walking') {
+                    a.state = 'idle';
+                    a.stateTimer = 1 + Math.random() * 3;
+                    // 30% chance to also turn around when idling
+                    if (Math.random() < 0.3) a.dir *= -1;
+                } else {
+                    a.state = 'walking';
+                    a.stateTimer = 2 + Math.random() * 5;
+                }
+            }
+            if (a.state === 'walking') {
+                a.x += a.baseSpeed * a.dir * (dt * 60); // dt-normalized
+                a.legPhase += dt * 8;
+                // Wrap at edges with a turnaround so they bounce
+                if (a.x > 1.02) { a.x = 1.02; a.dir = -1; }
+                if (a.x < -0.02) { a.x = -0.02; a.dir = 1; }
+            }
+
+            // --- poop timer ---
+            a.poopTimer -= dt;
+            if (a.poopTimer <= 0) {
+                // Drop manure at current foot position
+                const layer = this.layers.ground;
+                const px = Math.floor(a.x * this.width);
+                const py = layer.y + layer.height - 2;
+                this.manurePiles.push({
+                    x: px,
+                    y: py,
+                    age: 0,
+                    maxAge: 6, // seconds before fully fading
+                    size: a.type === 'cow' ? 5 : a.type === 'sheep' ? 4 : 3
+                });
+                // Add organic nitrogen to the soil — the educational tie-in
+                if (window.Nitrogen && Nitrogen.pools && Nitrogen.maxValues) {
+                    const add = a.type === 'cow' ? 4 : a.type === 'sheep' ? 3 : 2;
+                    Nitrogen.pools.organic = Math.min(
+                        (Nitrogen.pools.organic || 0) + add,
+                        Nitrogen.maxValues.organic
+                    );
+                    if (window.UI && UI.showFloatingNumber) {
+                        const tr = (typeof window.t === 'function') ? window.t : (k, v) => `+${v.amount} organic`;
+                        UI.showFloatingNumber(tr('farm.manure.float', { amount: add }), 'good');
+                    }
+                }
+                if (window.Audio && Audio.farmPoop) Audio.farmPoop();
+                // Next poop in 18-35 seconds (rare-ish per animal)
+                a.poopTimer = 18 + Math.random() * 17;
+            }
+
+            // --- vocalization timer (rare and quiet, per user request) ---
+            a.vocalTimer -= dt;
+            if (a.vocalTimer <= 0) {
+                if (window.Audio && Audio.farmCall) Audio.farmCall(a.type);
+                a.vocalTimer = 14 + Math.random() * 16;
+            }
+        });
+
+        // --- update manure piles (fade) ---
+        this.manurePiles = this.manurePiles.filter(p => {
+            p.age += dt;
+            return p.age < p.maxAge;
+        });
+    },
+
+    drawFarmAnimals(dt) {
+        // dt is seconds — clamp so a tab-switch doesn't fire 50 poops at once
+        const clampedDt = Math.min(dt || 1 / 60, 0.25);
+        this._updateFarmAnimals(clampedDt);
+
+        // Draw manure piles first (under the animals)
+        this.manurePiles.forEach(p => {
+            const fade = 1 - (p.age / p.maxAge);
+            this.ctx.globalAlpha = Math.max(0.2, fade);
+            this.ctx.fillStyle = '#5d3a1f';
+            this.ctx.fillRect(p.x - p.size, p.y - 1, p.size * 2, 2);
+            this.ctx.fillStyle = '#7a4a26';
+            this.ctx.fillRect(p.x - p.size + 1, p.y - 2, p.size * 2 - 2, 2);
+            this.ctx.fillRect(p.x - 1, p.y - 3, 3, 1);
+            this.ctx.globalAlpha = 1;
+        });
+
+        // Draw animals — feet at the TOP of the grass strip so the
+        // body sits visibly ABOVE the grass (not buried inside it).
+        this.farmAnimals.forEach(a => {
+            const px = Math.floor(a.x * this.width);
+            const baseY = this.layers.ground.y + 4;
+            const legSwing = a.state === 'walking' ? Math.floor(Math.sin(a.legPhase) * 2) : 0;
+            if (a.type === 'cow')     this._drawCow(px, baseY, a.dir, legSwing);
+            else if (a.type === 'sheep')   this._drawSheep(px, baseY, a.dir, legSwing);
+            else if (a.type === 'chicken') this._drawChicken(px, baseY, a.dir, legSwing);
+        });
+    },
+
+    // Pixel sprites are drawn from the animal's FEET (baseY) upwards. dir is
+    // +1 (facing right) or -1 (facing left) — we mirror the head/eye on -1.
+    // Sizes are ~2x what they used to be so they're clearly visible at
+    // standard canvas resolutions (~960 wide).
+    _drawCow(x, baseY, dir, legSwing) {
+        const ctx = this.ctx;
+        // Body — white base with brown patches (28x12)
+        ctx.fillStyle = '#f4f4f4';
+        ctx.fillRect(x - 14, baseY - 18, 28, 12);
+        // Brown patches
+        ctx.fillStyle = '#5d3a1f';
+        ctx.fillRect(x - 10, baseY - 16, 8, 6);
+        ctx.fillRect(x + 4, baseY - 18, 6, 6);
+        ctx.fillRect(x - 4, baseY - 10, 6, 4);
+        // Legs (4) — front pair anti-phase with back pair for trotting look
+        ctx.fillStyle = '#2a2a2a';
+        ctx.fillRect(x - 12, baseY - 6, 4, 6 + legSwing);
+        ctx.fillRect(x + 8,  baseY - 6, 4, 6 + legSwing);
+        ctx.fillRect(x - 6,  baseY - 6, 4, 6 - legSwing);
+        ctx.fillRect(x + 2,  baseY - 6, 4, 6 - legSwing);
+        // Head (8x8) — offset out one body-width
+        const hx = dir > 0 ? x + 12 : x - 20;
+        ctx.fillStyle = '#f4f4f4';
+        ctx.fillRect(hx, baseY - 16, 8, 8);
+        // Snout (pink)
+        ctx.fillStyle = '#e8a3a3';
+        ctx.fillRect(dir > 0 ? hx + 6 : hx, baseY - 12, 2, 4);
+        // Eye
+        ctx.fillStyle = '#181425';
+        ctx.fillRect(dir > 0 ? hx + 4 : hx + 2, baseY - 14, 2, 2);
+        // Horns
+        ctx.fillStyle = '#e8d59c';
+        ctx.fillRect(hx + 1, baseY - 18, 2, 2);
+        ctx.fillRect(hx + 5, baseY - 18, 2, 2);
+    },
+
+    _drawSheep(x, baseY, dir, legSwing) {
+        const ctx = this.ctx;
+        // Fluffy white body — stacked rects for cloud-like silhouette
+        ctx.fillStyle = '#f4f4f4';
+        ctx.fillRect(x - 12, baseY - 14, 24, 10); // main
+        ctx.fillRect(x - 10, baseY - 17, 20, 4);  // upper fluff
+        ctx.fillRect(x - 8,  baseY - 19, 16, 3);  // top fluff
+        // Legs (4)
+        ctx.fillStyle = '#2a2a2a';
+        ctx.fillRect(x - 10, baseY - 4, 3, 4 + legSwing);
+        ctx.fillRect(x + 7,  baseY - 4, 3, 4 + legSwing);
+        ctx.fillRect(x - 4,  baseY - 4, 3, 4 - legSwing);
+        ctx.fillRect(x + 1,  baseY - 4, 3, 4 - legSwing);
+        // Head — black face
+        const hx = dir > 0 ? x + 10 : x - 16;
+        ctx.fillStyle = '#2a2a2a';
+        ctx.fillRect(hx, baseY - 13, 6, 6);
+        // White muzzle / cheek
+        ctx.fillStyle = '#f4f4f4';
+        ctx.fillRect(dir > 0 ? hx + 4 : hx, baseY - 9, 2, 2);
+        // Eye
+        ctx.fillRect(dir > 0 ? hx + 4 : hx, baseY - 11, 2, 2);
+        ctx.fillStyle = '#181425';
+        ctx.fillRect(dir > 0 ? hx + 4 : hx + 1, baseY - 11, 1, 1);
+    },
+
+    _drawChicken(x, baseY, dir, legSwing) {
+        const ctx = this.ctx;
+        // Body — small white blob (~12x8)
+        ctx.fillStyle = '#f4f4f4';
+        ctx.fillRect(x - 6, baseY - 12, 12, 8);
+        // Tail feather pointing back
+        ctx.fillRect(dir > 0 ? x - 8 : x + 6, baseY - 12, 2, 4);
+        // Wing detail
+        ctx.fillStyle = '#dcdcdc';
+        ctx.fillRect(x - 4, baseY - 9, 6, 3);
+        // Legs — yellow, prominent leg-swing for chicken-walk feel
+        ctx.fillStyle = '#feae34';
+        ctx.fillRect(x - 3, baseY - 4, 2, 4 + legSwing);
+        ctx.fillRect(x + 1, baseY - 4, 2, 4 - legSwing);
+        // Head (4x4)
+        const hx = dir > 0 ? x + 4 : x - 8;
+        ctx.fillStyle = '#f4f4f4';
+        ctx.fillRect(hx, baseY - 16, 4, 4);
+        // Comb (red, on top)
+        ctx.fillStyle = '#e43b44';
+        ctx.fillRect(hx + 1, baseY - 18, 3, 2);
+        // Beak (yellow, pointing in walking direction)
+        ctx.fillStyle = '#feae34';
+        ctx.fillRect(dir > 0 ? hx + 4 : hx - 2, baseY - 14, 2, 2);
+        // Eye
+        ctx.fillStyle = '#181425';
+        ctx.fillRect(dir > 0 ? hx + 2 : hx + 1, baseY - 15, 1, 1);
     },
 
     generateMycelium() {
@@ -2294,6 +2533,9 @@ const Renderer = {
         this.drawSkyCreatures(temperature, dayProgress);
 
         this.drawGround();
+        // Farm animals walk on the grass. Pass dt (seconds since last
+        // frame) for smooth animation; default to ~16ms if unknown.
+        this.drawFarmAnimals(window.Game ? (window.Game._lastFrameDelta || 16) / 1000 : 0.016);
         this.drawTopsoil();
         this.drawSubsoil();
         this.drawWater();
