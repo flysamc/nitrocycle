@@ -324,6 +324,12 @@ const Renderer = {
                         const tr = (typeof window.t === 'function') ? window.t : (k, v) => `+${v.amount} organic`;
                         UI.showFloatingNumber(tr('farm.manure.float', { amount: add }), 'good');
                     }
+                    // Each manure pile also drops a single coin — light passive
+                    // income to ease money pressure without trivializing the
+                    // shop (rebalance design 2026-04-15).
+                    if (window.Game) {
+                        Game.money = (Game.money || 0) + 1;
+                    }
                 }
                 if (window.Audio && Audio.farmPoop) Audio.farmPoop();
                 // Next poop in 18-35 seconds (rare-ish per animal)
