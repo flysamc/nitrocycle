@@ -56,6 +56,7 @@
         <div class="diff-actions">
             <button class="diff-action-btn" id="menu-help" data-i18n="menu.howToPlay">? HOW TO PLAY</button>
             <button class="diff-action-btn" id="menu-load" data-i18n="menu.loadSave">📂 LOAD SAVE</button>
+            <button class="diff-action-btn" id="menu-leaderboard" data-i18n="menu.leaderboard">🏆 LEADERBOARD</button>
         </div>
         <div class="diff-quickguide">
             <div class="qg-title" data-i18n="menu.quickGuide">QUICK GUIDE</div>
@@ -619,7 +620,54 @@
                 <div id="overlay-title">GAME OVER</div>
                 <div id="overlay-message"></div>
                 <div id="overlay-stats"></div>
-                <button id="btn-restart" data-i18n="over.playAgain">PLAY AGAIN</button>
+                <div id="overlay-actions">
+                    <button id="btn-restart" data-i18n="over.playAgain">PLAY AGAIN</button>
+                    <button id="btn-save-score" class="hidden" data-i18n="over.saveScore">🏆 SAVE MY SCORE</button>
+                    <button id="btn-view-leaderboard" data-i18n="over.viewLeaderboard">🏆 LEADERBOARD</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Name Entry Modal (shown after a win) -->
+        <div id="name-modal" class="hidden">
+            <div id="name-modal-content">
+                <div class="name-modal-title" data-i18n="name.title">🏆 YOU WON!</div>
+                <div class="name-modal-sub" data-i18n="name.sub">Enter your name for the leaderboard:</div>
+                <input type="text" id="name-input" maxlength="16" autocomplete="off" spellcheck="false" />
+                <div class="name-modal-error" id="name-modal-error"></div>
+                <div class="name-modal-actions">
+                    <button id="name-cancel" class="name-modal-btn skip" data-i18n="name.skip">SKIP</button>
+                    <button id="name-submit" class="name-modal-btn primary" data-i18n="name.submit">SUBMIT</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leaderboard Modal -->
+        <div id="leaderboard-modal" class="hidden">
+            <div id="leaderboard-content">
+                <div class="lb-header">
+                    <div class="lb-title" data-i18n="lb.title">🏆 LEADERBOARD</div>
+                    <button class="lb-close" id="lb-close" aria-label="Close">✕</button>
+                </div>
+                <div class="lb-tabs" role="tablist">
+                    <button class="lb-tab active" data-diff="easy" data-i18n="menu.diff.easy">EASY</button>
+                    <button class="lb-tab" data-diff="normal" data-i18n="menu.diff.normal">NORMAL</button>
+                    <button class="lb-tab" data-diff="hard" data-i18n="menu.diff.hard">HARD</button>
+                </div>
+                <div class="lb-body">
+                    <div class="lb-status" id="lb-status" data-i18n="lb.loading">Loading…</div>
+                    <table class="lb-table hidden" id="lb-table">
+                        <thead>
+                            <tr>
+                                <th class="lb-col-rank">#</th>
+                                <th class="lb-col-name" data-i18n="lb.col.name">Name</th>
+                                <th class="lb-col-score" data-i18n="lb.col.score">Score</th>
+                                <th class="lb-col-days" data-i18n="lb.col.days">Days</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lb-tbody"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -634,6 +682,7 @@
     <script src="js/ui.js"></script>
     <script src="js/tutorial.js"></script>
     <script src="js/achievements.js"></script>
+    <script src="js/leaderboard.js"></script>
     <script src="js/game.js"></script>
 </body>
 </html>

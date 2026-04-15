@@ -36,6 +36,7 @@ const STRINGS = {
         'menu.diff.hard.desc': '9s days, fast scaling, $20',
         'menu.howToPlay': '? HOW TO PLAY',
         'menu.loadSave': '📂 LOAD SAVE',
+        'menu.leaderboard': '🏆 LEADERBOARD',
         'menu.quickGuide': 'QUICK GUIDE',
         'menu.qg.fix': '<span class="qg-key">FIX</span> Convert N₂ → NH₄⁺ (basic plant food)',
         'menu.qg.nitrify': '<span class="qg-key">NITRIFY</span> NH₄⁺ → NO₂⁻ → NO₃⁻ (<strong>+50% feed bonus!</strong>)',
@@ -374,6 +375,28 @@ const STRINGS = {
         'over.n2oProduced': 'N₂O PRODUCED',
         'over.leached': 'NO₃⁻ LEACHED',
         'over.playAgain': 'PLAY AGAIN',
+        'over.saveScore': '🏆 SAVE MY SCORE',
+        'over.viewLeaderboard': '🏆 LEADERBOARD',
+
+        // ===== Name entry modal =====
+        'name.title': '🏆 YOU WON!',
+        'name.sub': 'Enter your name for the leaderboard:',
+        'name.submit': 'SUBMIT',
+        'name.skip': 'SKIP',
+        'name.error.empty': 'Please enter a name.',
+        'name.error.network': 'Could not save — check your connection.',
+        'name.error.offline': 'Leaderboard is only available on the live site.',
+        'name.saving': 'Saving…',
+
+        // ===== Leaderboard modal =====
+        'lb.title': '🏆 LEADERBOARD',
+        'lb.col.name': 'Name',
+        'lb.col.score': 'Score',
+        'lb.col.days': 'Days',
+        'lb.loading': 'Loading…',
+        'lb.empty': 'No scores yet — be the first!',
+        'lb.error.network': 'Could not load leaderboard.',
+        'lb.error.offline': 'Leaderboard is only available on the live site (deploy to view).',
 
         // ===== Log messages =====
         'log.gameStarted': 'GAME STARTED!',
@@ -408,6 +431,7 @@ const STRINGS = {
         'menu.diff.hard.desc': '9s/Tag, schnell, $20',
         'menu.howToPlay': '? SPIELANLEITUNG',
         'menu.loadSave': '📂 LADEN',
+        'menu.leaderboard': '🏆 BESTENLISTE',
         'menu.quickGuide': 'KURZANLEITUNG',
         'menu.qg.fix': '<span class="qg-key">FIX</span> N₂ → NH₄⁺ (einfaches Pflanzenfutter)',
         'menu.qg.nitrify': '<span class="qg-key">NITRIFY</span> NH₄⁺ → NO₂⁻ → NO₃⁻ (<strong>+50% Futter-Bonus!</strong>)',
@@ -746,6 +770,28 @@ const STRINGS = {
         'over.n2oProduced': 'N₂O ERZEUGT',
         'over.leached': 'NO₃⁻ AUSGEWASCHEN',
         'over.playAgain': 'NOCHMAL SPIELEN',
+        'over.saveScore': '🏆 SCORE SPEICHERN',
+        'over.viewLeaderboard': '🏆 BESTENLISTE',
+
+        // ===== Name entry modal =====
+        'name.title': '🏆 GEWONNEN!',
+        'name.sub': 'Gib deinen Namen für die Bestenliste ein:',
+        'name.submit': 'SENDEN',
+        'name.skip': 'ÜBERSPRINGEN',
+        'name.error.empty': 'Bitte einen Namen eingeben.',
+        'name.error.network': 'Konnte nicht speichern – prüfe deine Verbindung.',
+        'name.error.offline': 'Bestenliste nur auf der Live-Seite verfügbar.',
+        'name.saving': 'Speichere…',
+
+        // ===== Leaderboard modal =====
+        'lb.title': '🏆 BESTENLISTE',
+        'lb.col.name': 'Name',
+        'lb.col.score': 'Punkte',
+        'lb.col.days': 'Tage',
+        'lb.loading': 'Lade…',
+        'lb.empty': 'Noch keine Einträge – sei die/der Erste!',
+        'lb.error.network': 'Konnte Bestenliste nicht laden.',
+        'lb.error.offline': 'Bestenliste nur auf der Live-Seite verfügbar (deployen zum Anzeigen).',
 
         // ===== Log messages =====
         'log.gameStarted': 'SPIEL GESTARTET!',

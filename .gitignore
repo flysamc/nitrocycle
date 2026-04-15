@@ -1,3 +1,10 @@
+# Node / npm
+node_modules/
+npm-debug.log*
+
+# Netlify build / cache (anything in .netlify is generated)
+.netlify/
+
 # macOS
 .DS_Store
 .AppleDouble

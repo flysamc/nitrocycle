@@ -1,0 +1,17 @@
+{
+  "name": "nitrocycle",
+  "version": "1.0.0",
+  "description": "Pixel-art nitrogen-cycle game with DE/EN i18n. Built for Lange Nacht der Forschung.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "netlify dev",
+    "deploy": "netlify deploy --prod"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0"
+  },
+  "devDependencies": {
+    "@netlify/functions": "^2.8.0"
+  }
+}

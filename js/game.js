@@ -98,6 +98,7 @@ const Game = {
         this.setupMenuButtons();
         this.setupMobilePanelToggles();
         this.setupLanguageToggle();
+        this.setupLeaderboard();
 
         // Initialize tutorial and achievements
         if (typeof Tutorial !== 'undefined') Tutorial.init();
@@ -283,6 +284,8 @@ const Game = {
                     const top = this._modalStack[this._modalStack.length - 1];
                     if (top === 'cycleDiagram') UI.hideCycleDiagram();
                     else if (top === 'poolInfo') UI.hidePoolInfo();
+                    else if (top === 'leaderboard') this.closeLeaderboard();
+                    else if (top === 'nameEntry') this.closeNameModal();
                     return;
                 }
                 if (this.state === 'playing') {
@@ -355,6 +358,186 @@ const Game = {
         });
         // Mark the active button on initial load
         if (window.I18N) I18N._refreshToggleUI();
+    },
+
+    // ========== LEADERBOARD ==========
+    // Three modal flows:
+    //   - menu "🏆 LEADERBOARD" button     -> openLeaderboard()
+    //   - game-over "🏆 LEADERBOARD" button -> openLeaderboard()
+    //   - game-over "🏆 SAVE MY SCORE"      -> openNameModal() -> submit -> openLeaderboard()
+    // The save-score button is only shown after a WIN (not on death).
+    setupLeaderboard() {
+        const menuBtn = document.getElementById('menu-leaderboard');
+        const overBtn = document.getElementById('btn-view-leaderboard');
+        const saveBtn = document.getElementById('btn-save-score');
+        const closeBtn = document.getElementById('lb-close');
+        const tabs = document.querySelectorAll('#leaderboard-modal .lb-tab');
+        const submitBtn = document.getElementById('name-submit');
+        const cancelBtn = document.getElementById('name-cancel');
+        const nameInput = document.getElementById('name-input');
+
+        if (menuBtn) menuBtn.addEventListener('click', () => {
+            this.openLeaderboard(this.difficulty || 'normal');
+            Audio.click();
+        });
+        if (overBtn) overBtn.addEventListener('click', () => {
+            this.openLeaderboard(this.difficulty || 'normal');
+            Audio.click();
+        });
+        if (saveBtn) saveBtn.addEventListener('click', () => {
+            this.openNameModal();
+            Audio.click();
+        });
+        if (closeBtn) closeBtn.addEventListener('click', () => this.closeLeaderboard());
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                this._loadLeaderboard(tab.getAttribute('data-diff'));
+            });
+        });
+        if (submitBtn) submitBtn.addEventListener('click', () => this._submitScore());
+        if (cancelBtn) cancelBtn.addEventListener('click', () => this.closeNameModal());
+        if (nameInput) {
+            nameInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    this._submitScore();
+                }
+            });
+        }
+
+        // Pre-fill saved username
+        if (nameInput && window.Leaderboard) {
+            nameInput.value = Leaderboard.savedName;
+        }
+    },
+
+    openLeaderboard(initialDiff) {
+        const modal = document.getElementById('leaderboard-modal');
+        if (!modal) return;
+        // Highlight the requested tab
+        document.querySelectorAll('#leaderboard-modal .lb-tab').forEach(t => {
+            t.classList.toggle('active', t.getAttribute('data-diff') === initialDiff);
+        });
+        modal.classList.remove('hidden');
+        if (this.openModal) this.openModal('leaderboard');
+        this._loadLeaderboard(initialDiff);
+    },
+
+    closeLeaderboard() {
+        const modal = document.getElementById('leaderboard-modal');
+        if (modal) modal.classList.add('hidden');
+        if (this.closeModal) this.closeModal('leaderboard');
+        Audio.click();
+    },
+
+    async _loadLeaderboard(diff, highlightTimestamp) {
+        const status = document.getElementById('lb-status');
+        const table = document.getElementById('lb-table');
+        const tbody = document.getElementById('lb-tbody');
+        if (!status || !table || !tbody) return;
+
+        // Reset to loading state
+        status.classList.remove('error', 'hidden');
+        status.classList.remove('hidden');
+        status.textContent = t('lb.loading');
+        table.classList.add('hidden');
+        tbody.innerHTML = '';
+
+        try {
+            const data = await Leaderboard.fetch(diff);
+            const entries = data.entries || [];
+            if (entries.length === 0) {
+                status.textContent = t('lb.empty');
+                return;
+            }
+            entries.forEach((e, i) => {
+                const tr = document.createElement('tr');
+                if (highlightTimestamp && e.timestamp === highlightTimestamp) {
+                    tr.classList.add('you');
+                }
+                const escape = (s) => String(s).replace(/[&<>"']/g, c => (
+                    { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
+                ));
+                tr.innerHTML =
+                    `<td class="lb-col-rank">${i + 1}</td>` +
+                    `<td class="lb-col-name">${escape(e.name)}</td>` +
+                    `<td class="lb-col-score">${e.score}</td>` +
+                    `<td class="lb-col-days">${e.days}</td>`;
+                tbody.appendChild(tr);
+            });
+            status.classList.add('hidden');
+            table.classList.remove('hidden');
+        } catch (err) {
+            status.classList.add('error');
+            status.textContent = err.offline ? t('lb.error.offline') : t('lb.error.network');
+        }
+    },
+
+    openNameModal() {
+        const modal = document.getElementById('name-modal');
+        const input = document.getElementById('name-input');
+        const errEl = document.getElementById('name-modal-error');
+        if (!modal) return;
+        if (errEl) errEl.textContent = '';
+        if (input) {
+            if (!input.value && window.Leaderboard) input.value = Leaderboard.savedName;
+            modal.classList.remove('hidden');
+            // Focus next tick so the modal animation doesn't eat the focus
+            setTimeout(() => input.focus(), 50);
+        } else {
+            modal.classList.remove('hidden');
+        }
+        if (this.openModal) this.openModal('nameEntry');
+    },
+
+    closeNameModal() {
+        const modal = document.getElementById('name-modal');
+        if (modal) modal.classList.add('hidden');
+        if (this.closeModal) this.closeModal('nameEntry');
+    },
+
+    async _submitScore() {
+        const input = document.getElementById('name-input');
+        const errEl = document.getElementById('name-modal-error');
+        const submitBtn = document.getElementById('name-submit');
+        if (!input || !errEl) return;
+
+        const name = input.value.trim();
+        if (!name) {
+            errEl.textContent = t('name.error.empty');
+            return;
+        }
+
+        errEl.textContent = '';
+        submitBtn.disabled = true;
+        submitBtn.textContent = t('name.saving');
+
+        try {
+            Leaderboard.setSavedName(name);
+            const result = await Leaderboard.submit({
+                name,
+                score: this.score,
+                days: this.day,
+                difficulty: this.difficulty || 'normal'
+            });
+            Audio.goodEvent();
+            this.closeNameModal();
+            // Hide the save-score button so they can't re-submit
+            const saveBtn = document.getElementById('btn-save-score');
+            if (saveBtn) saveBtn.classList.add('hidden');
+            // Open leaderboard with the new entry highlighted
+            this.openLeaderboard(this.difficulty || 'normal');
+            // Re-load with their timestamp so the new row gets highlighted
+            this._loadLeaderboard(this.difficulty || 'normal', result.entry?.timestamp);
+        } catch (err) {
+            errEl.textContent = err.offline ? t('name.error.offline') : t('name.error.network');
+            Audio.error();
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = t('name.submit');
+        }
     },
 
     setupTooltips() {
@@ -1038,6 +1221,7 @@ const Game = {
     },
 
     checkWinLose() {
+        const saveScoreBtn = document.getElementById('btn-save-score');
         if (Plant.hasWon()) {
             this.state = 'won';
             this.score += 200;
@@ -1063,6 +1247,8 @@ const Game = {
                 n2o: this.stats.n2oProduced,
                 leached: this.stats.leached
             });
+            // Win → offer to save score
+            if (saveScoreBtn) saveScoreBtn.classList.remove('hidden');
         } else if (Plant.isDead()) {
             this.state = 'lost';
             Audio.stopMusic();
@@ -1076,6 +1262,8 @@ const Game = {
                 n2o: this.stats.n2oProduced,
                 leached: this.stats.leached
             });
+            // Loss → don't offer score saving
+            if (saveScoreBtn) saveScoreBtn.classList.add('hidden');
         }
     },
 
