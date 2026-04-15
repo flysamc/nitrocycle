@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎨 Pixel Art Assets Preview - Soil Food Web Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .gallery-section {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .gallery-section h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .assets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .asset-card {
+            background: #f5f5f5;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        .asset-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .asset-image {
+            background: linear-gradient(135deg, #f0f0f0 0%, #ffffff 100%);
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+        }
+
+        .asset-image img {
+            max-width: 100%;
+            max-height: 100%;
+            image-rendering: pixelated;
+        }
+
+        .asset-name {
+            font-size: 0.85em;
+            color: #333;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .stats {
+            background: #f0f7ff;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 4px;
+        }
+
+        .stats p {
+            margin: 5px 0;
+            color: #333;
+        }
+
+        .description {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+
+        .emoji {
+            font-size: 1.3em;
+            margin-right: 5px;
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            padding-top: 20px;
+            border-top: 2px solid rgba(255,255,255,0.3);
+            margin-top: 40px;
+        }
+
+        .comparison {
+            background: #fffacd;
+            border-left: 4px solid #ff9800;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+
+        .comparison strong {
+            color: #ff6f00;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .assets-grid {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+
+            .gallery-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎨 Soil Food Web Game - Pixel Art Assets</h1>
+            <p>Custom-created premium pixel art sprites for your vertical farming game</p>
+        </header>
+
+        <!-- PLANTS SECTION -->
+        <div class="gallery-section">
+            <h2><span class="emoji">🌱</span>Plant Growth Stages (64x64px)</h2>
+            <div class="assets-grid">
+                <div class="asset-card">
+                    <div class="asset-image">
+                        <img src="plants/plant_stage_1.png" alt="Seed">
+                    </div>
+                    <div class="asset-name">Stage 1: Seed</div>
+                </div>
+                <div class="asset-card">
+                    <div class="asset-image">
+                        <img src="plants/plant_stage_2.png" alt="Sprout">
+                    </div>
+                    <div class="asset-name">Stage 2: Sprout</div>
+                </div>
+                <div class="asset-card">
+                    <div class="asset-image">
+                        <img src="plants/plant_stage_3.png" alt="Young Plant">
+                    </div>
+                    <div class="asset-name">Stage 3: Young Plant</div>
+                </div>
+                <div class="asset-card">
+                    <div class="asset-image">
+                        <img src="plants/plant_stage_4.png" alt="Mature Plant">
+                    </div>
+                    <div class="asset-name">Stage 4: Mature</div>
+                </div>
+                <div class="asset-card">
+                    <div class="asset-image">
+                        <img src="plants/plant_stage_5.png" alt="Tree">
+                    </div>
+                    <div class="asset-name">Stage 5: Tree</div>
+                </div>
+            </div>
+            <div class="description">
+                Complete plant lifecycle from seed to tree. Use for displaying plant growth stages in your game. Each stage shows root development and leaf growth.
+            </div>
+        </div>
+
+        <!-- SOIL SECTION -->
+        <div class="gallery-section">
+            <h2><span class="emoji">🏜️</span>Soil Layers (64x32px)</h2>
+            <div class="assets-grid">
+                <div class="asset-card">
+                    <div class="asset-image">
+                        <img src="soil/soil_top.png" alt="Top Soil">
+                    </div>
+                    <div class="asset-name">Top Soil (Surface)</div>
+                </div>
+                <div class="asset-card">
+                    <div class="asset-image">
+                        <img src="soil/soil_middle.png" alt="Middle Soil">
+                    </div>
+                    <div class="asset-name">Middle Soil</div>
+                </div>
+                <div class="asset-card">
+                    <div class="asset-image">
+                        <img src="soil/soil_bottom.png" alt="Deep Soil">
+                    </div>
+                    <div class="asset-name">Deep Soil (Bedrock)</div>
+                </div>
+            </div>
+            <div class="description">
+                Three soil layer textures to create your vertical soil profile. Perfect for showing the different zones where organisms live and nutrients cycle.
+            </div>
+        </div>
+
+        <!-- ORGANISMS SECTION -->
+        <div class="gallery-section">
+            <h2><span class="emoji">🦠</span>Soil Organisms (32x32px)</h2>
+            <div class="assets-grid">
+                <div class="asset-card">
+                    <div class="asset-image">
+                        <img src="organisms/bacteria.png" alt="Bacteria">
+                    </div>
+                    <div class="asset-name">Bacteria</div>
+                </div>
+                <div class="asset-card">
+                    <div class="asset-image">
+                        <img src="organisms/fungus.png" alt="Fungus">
+                    </div>
+                    <div class="asset-name">Fungus</div>
+                </div>
+                <div class="asset-card">
+                    <div class="asset-image">
+                        <img src="organisms/earthworm.png" alt="Earthworm">
+                    </div>
+                    <div class="asset-name">Earthworm</div>
+                </div>
+                <div class="asset-card">
+                    <div class="asset-image">
+                        <img src="organisms/root_system.png" alt="Root System">
+                    </div>
+                    <div class="asset-name">Root System</div>
+                </div>
+                <div class="asset-card">
+                    <div class="asset-image">
+                        <img src="organisms/nitrogen.png" alt="Nitrogen">
+                    </div>
+                    <div class="asset-name">Nitrogen (N)</div>
+                </div>
+            </div>
+            <div class="description">
+                Key soil food web members. Show how bacteria fix nitrogen, fungi decompose organic matter, and earthworms aerate soil. Perfect for educational display.
+            </div>
+        </div>
+
+        <!-- ENVIRONMENT SECTION -->
+        <div class="gallery-section">
+            <h2><span class="emoji">🌍</span>Environment Elements (32x32px)</h2>
+            <div class="assets-grid">
+                <div class="asset-card">
+                    <div class="asset-image">
+                        <img src="environment/rock.png" alt="Rock">
+                    </div>
+                    <div class="asset-name">Rock</div>
+                </div>
+                <div class="asset-card">
+                    <div class="asset-image">
+                        <img src="environment/leaf_litter.png" alt="Leaf Litter">
+                    </div>
+                    <div class="asset-name">Leaf Litter</div>
+                </div>
+                <div class="asset-card">
+                    <div class="asset-image">
+                        <img src="environment/compost.png" alt="Compost">
+                    </div>
+                    <div class="asset-name">Compost Pile</div>
+                </div>
+            </div>
+            <div class="description">
+                Environmental elements to add context and realism to your game scene. Show where decomposition happens and organic matter enters the food web.
+            </div>
+        </div>
+
+        <!-- UI SECTION -->
+        <div class="gallery-section">
+            <h2><span class="emoji">🎮</span>UI Elements</h2>
+            <div class="assets-grid">
+                <div class="asset-card">
+                    <div class="asset-image">
+                        <img src="ui/health_bar_full.png" alt="Health Bar Full">
+                    </div>
+                    <div class="asset-name">Health Bar (Full)</div>
+                </div>
+                <div class="asset-card">
+                    <div class="asset-image">
+                        <img src="ui/health_bar_low.png" alt="Health Bar Low">
+                    </div>
+                    <div class="asset-name">Health Bar (Low)</div>
+                </div>
+                <div class="asset-card">
+                    <div class="asset-image">
+                        <img src="ui/add_nitrogen.png" alt="Add Nitrogen">
+                    </div>
+                    <div class="asset-name">Add Nitrogen</div>
+                </div>
+                <div class="asset-card">
+                    <div class="asset-image">
+                        <img src="ui/remove_nitrogen.png" alt="Remove Nitrogen">
+                    </div>
+                    <div class="asset-name">Remove Nitrogen</div>
+                </div>
+                <div class="asset-card">
+                    <div class="asset-image">
+                        <img src="ui/nitrogen_indicator.png" alt="Nitrogen Indicator">
+                    </div>
+                    <div class="asset-name">Nitrogen Indicator</div>
+                </div>
+            </div>
+            <div class="description">
+                Interactive UI elements for your game interface. Use for buttons, health bars, and status indicators.
+            </div>
+        </div>
+
+        <!-- SUMMARY -->
+        <div class="gallery-section">
+            <h2>📊 Asset Collection Summary</h2>
+            <div class="stats">
+                <p><strong>Total Assets Created: 24</strong></p>
+                <p>✓ 5 Plant growth stages (64x64px) - For showing plant lifecycle</p>
+                <p>✓ 3 Soil layers (64x32px) - For vertical soil profile</p>
+                <p>✓ 5 Soil organisms (32x32px) - For food web display</p>
+                <p>✓ 3 Environment elements (32x32px) - For context</p>
+                <p>✓ 5 UI elements (various sizes) - For game interface</p>
+                <p>✓ 3 Legacy icons (from previous creation)</p>
+            </div>
+
+            <div class="comparison">
+                <strong>Quality Improvement:</strong> These assets are MUCH better than basic emoji! Each sprite is custom-designed with:
+                <ul style="margin-top: 10px; margin-left: 20px;">
+                    <li>Detailed 16+ color palettes</li>
+                    <li>Proper shading and highlights</li>
+                    <li>Educational accuracy (real soil layers, realistic organisms)</li>
+                    <li>Larger sizes (32x32 and 64x64) for better visibility</li>
+                    <li>Transparent backgrounds for easy layering</li>
+                </ul>
+            </div>
+        </div>
+
+        <footer>
+            <p>🎮 Ready to integrate into your Soil Food Web educational game!</p>
+            <p>Check ASSET_SOURCES.md for even more free assets from OpenGameArt, itch.io, and CraftPix</p>
+        </footer>
+    </div>
+</body>
+</html>

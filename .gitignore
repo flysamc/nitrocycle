@@ -1,0 +1,23 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*~
+
+# Claude Code local state (settings, scheduled-tasks transcripts, etc.)
+# Keep launch.json so previewing works for everyone, drop personal state.
+.claude/settings.local.json
+.claude/scheduled_tasks.json
+
+# Logs
+*.log
+npm-debug.log*
+
+# Misc
+.env
+.env.local

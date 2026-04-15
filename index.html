@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NitroCycle - Learn the Nitrogen Cycle!</title>
+    <link rel="stylesheet" href="css/style.css">
+    <!-- i18n must load BEFORE other scripts so data-i18n attributes
+         render correctly on first paint. -->
+    <script src="js/i18n.js"></script>
+</head>
+<body>
+    <!-- Language Toggle (floats above everything) -->
+    <div id="lang-toggle" role="group" aria-label="Language">
+        <button type="button" id="lang-de" class="lang-btn active" data-lang="de" aria-label="Deutsch">
+            <span class="lang-flag" aria-hidden="true">🇦🇹</span>
+            <span class="lang-code">DE</span>
+        </button>
+        <button type="button" id="lang-en" class="lang-btn" data-lang="en" aria-label="English">
+            <span class="lang-flag" aria-hidden="true">🇬🇧</span>
+            <span class="lang-code">EN</span>
+        </button>
+    </div>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div id="loading-title">NITROCYCLE</div>
+        <div id="loading-subtitle" data-i18n="loading.subtitle">Learn the Nitrogen Cycle!</div>
+        <div id="loading-bar-container">
+            <div id="loading-bar"></div>
+        </div>
+        <div id="loading-text" data-i18n="loading.text">Loading assets...</div>
+    </div>
+
+    <!-- Difficulty Select / Main Menu -->
+    <div id="difficulty-select" class="hidden">
+        <div class="diff-header">
+            <div class="diff-logo">NITROCYCLE</div>
+            <div class="diff-tagline" data-i18n="menu.tagline">Master the Nitrogen Cycle!</div>
+        </div>
+        <div class="diff-title" data-i18n="menu.selectDifficulty">SELECT DIFFICULTY</div>
+        <div class="diff-buttons">
+            <button class="diff-btn" data-diff="easy">
+                <span class="diff-name" data-i18n="menu.diff.easy">EASY</span>
+                <span class="diff-desc" data-i18n="menu.diff.easy.desc">18s days, slow scaling, $50</span>
+            </button>
+            <button class="diff-btn selected" data-diff="normal">
+                <span class="diff-name" data-i18n="menu.diff.normal">NORMAL</span>
+                <span class="diff-desc" data-i18n="menu.diff.normal.desc">12s days, standard, $30</span>
+            </button>
+            <button class="diff-btn" data-diff="hard">
+                <span class="diff-name" data-i18n="menu.diff.hard">HARD</span>
+                <span class="diff-desc" data-i18n="menu.diff.hard.desc">9s days, fast scaling, $20</span>
+            </button>
+        </div>
+        <div class="diff-actions">
+            <button class="diff-action-btn" id="menu-help" data-i18n="menu.howToPlay">? HOW TO PLAY</button>
+            <button class="diff-action-btn" id="menu-load" data-i18n="menu.loadSave">📂 LOAD SAVE</button>
+        </div>
+        <div class="diff-quickguide">
+            <div class="qg-title" data-i18n="menu.quickGuide">QUICK GUIDE</div>
+            <div class="qg-items">
+                <div class="qg-item" data-i18n-html="menu.qg.fix"><span class="qg-key">FIX</span> Convert N₂ → NH₄⁺ (basic plant food)</div>
+                <div class="qg-item" data-i18n-html="menu.qg.nitrify"><span class="qg-key">NITRIFY</span> NH₄⁺ → NO₂⁻ → NO₃⁻ (<strong>+50% feed bonus!</strong>)</div>
+                <div class="qg-item" data-i18n-html="menu.qg.feed"><span class="qg-key">FEED</span> Give nitrogen to your plant to grow it</div>
+                <div class="qg-item" data-i18n-html="menu.qg.denitrify"><span class="qg-key">DENITRIFY</span> Reduce NO₃⁻ when it's dangerously high</div>
+                <div class="qg-item bad" data-i18n-html="menu.qg.avoid"><span class="qg-key">⚠</span> Avoid N₂O (greenhouse gas) & leaching!</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Game -->
+    <div id="game-container">
+        <!-- Header -->
+        <header id="game-header">
+            <h1>NITROCYCLE</h1>
+            <div id="header-controls">
+                <button class="icon-btn mobile-only" id="btn-toggle-pools" data-i18n="header.pools" data-i18n-title="tip.togglePools" title="Show/hide nitrogen pools">POOLS</button>
+                <button class="icon-btn mobile-only" id="btn-toggle-status" data-i18n="header.status" data-i18n-title="tip.toggleStatus" title="Show/hide plant status">STATUS</button>
+                <button class="icon-btn" id="btn-sound" data-i18n="header.sfx" data-i18n-title="tip.toggleSound" title="Toggle Sound">SFX</button>
+                <button class="icon-btn" id="btn-music" data-i18n="header.bgm" data-i18n-title="tip.toggleMusic" title="Toggle Music">BGM</button>
+                <button class="icon-btn pause-btn" id="btn-pause" data-i18n-tooltip="tip.pause" data-tooltip="Pause game (P)">❚❚</button>
+                <button class="icon-btn" id="btn-help" data-i18n-title="tip.help" title="Help">?</button>
+            </div>
+            <div id="header-stats">
+                <div class="stat-box"><span data-i18n="header.day">DAY</span> <span id="day-counter">1</span></div>
+                <div class="stat-box"><span data-i18n="header.score">SCORE</span> <span id="score-display">0</span></div>
+                <div class="stat-box money-box">$ <span id="money-display">30</span></div>
+            </div>
+        </header>
+
+        <!-- Main Game Area -->
+        <main id="game-main">
+            <!-- Left Panel - Nitrogen Pools -->
+            <div id="left-panel">
+                <div class="panel" id="pools-panel">
+                    <div class="panel-title" data-i18n="panel.pools">NITROGEN POOLS</div>
+
+                    <!-- Atmosphere Section -->
+                    <div class="pool-section">
+                        <div class="section-label" data-i18n="panel.atmosphere">ATMOSPHERE</div>
+
+                        <div class="pool-item" data-pool="n2" data-i18n-title="pool.clickForInfo" title="Click for info">
+                            <div class="pool-header">
+                                <div class="pool-icon n2-icon"></div>
+                                <div class="pool-info">
+                                    <span class="pool-formula">N₂</span>
+                                    <span class="pool-name" data-i18n="pool.n2.name">Dinitrogen</span>
+                                </div>
+                                <span class="pool-value" id="val-n2">200</span>
+                            </div>
+                            <div class="pool-bar">
+                                <div class="pool-fill n2" id="bar-n2" style="width: 80%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Soil Section -->
+                    <div class="pool-section">
+                        <div class="section-label" data-i18n="panel.soil">SOIL</div>
+
+                        <div class="pool-item" data-pool="nh4" data-i18n-title="pool.clickForInfo" title="Click for info">
+                            <div class="pool-header">
+                                <div class="pool-icon nh4-icon"></div>
+                                <div class="pool-info">
+                                    <span class="pool-formula">NH₄⁺</span>
+                                    <span class="pool-name" data-i18n="pool.nh4.name">Ammonium</span>
+                                </div>
+                                <span class="pool-value" id="val-nh4">15</span>
+                            </div>
+                            <div class="pool-bar">
+                                <div class="pool-fill nh4" id="bar-nh4" style="width: 15%"></div>
+                            </div>
+                        </div>
+
+                        <div class="pool-item" data-pool="no2" data-i18n-title="pool.clickForInfo" title="Click for info">
+                            <div class="pool-header">
+                                <div class="pool-icon no2-icon"></div>
+                                <div class="pool-info">
+                                    <span class="pool-formula">NO₂⁻</span>
+                                    <span class="pool-name" data-i18n="pool.no2.name">Nitrite</span>
+                                </div>
+                                <span class="pool-value" id="val-no2">0</span>
+                            </div>
+                            <div class="pool-bar">
+                                <div class="pool-fill no2" id="bar-no2" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <div class="pool-item" data-pool="no3" data-i18n-title="pool.clickForInfo" title="Click for info">
+                            <div class="pool-header">
+                                <div class="pool-icon no3-icon"></div>
+                                <div class="pool-info">
+                                    <span class="pool-formula">NO₃⁻</span>
+                                    <span class="pool-name" data-i18n="pool.no3.name">Nitrate</span>
+                                </div>
+                                <span class="pool-value" id="val-no3">10</span>
+                            </div>
+                            <div class="pool-bar">
+                                <div class="pool-fill no3" id="bar-no3" style="width: 10%"></div>
+                            </div>
+                        </div>
+
+                        <div class="pool-item" data-pool="organic" data-i18n-title="pool.clickForInfo" title="Click for info">
+                            <div class="pool-header">
+                                <div class="pool-icon organic-icon"></div>
+                                <div class="pool-info">
+                                    <span class="pool-formula">R-NH₂</span>
+                                    <span class="pool-name" data-i18n="pool.organic.name">Organic N</span>
+                                </div>
+                                <span class="pool-value" id="val-organic">80</span>
+                            </div>
+                            <div class="pool-bar">
+                                <div class="pool-fill organic" id="bar-organic" style="width: 53%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Losses Section -->
+                    <div class="pool-section losses">
+                        <div class="section-label bad" data-i18n="panel.losses">LOSSES (BAD!)</div>
+
+                        <div class="pool-item bad" data-pool="n2o" data-i18n-title="pool.clickForInfo" title="Click for info">
+                            <div class="pool-header">
+                                <div class="pool-icon n2o-icon"></div>
+                                <div class="pool-info">
+                                    <span class="pool-formula">N₂O</span>
+                                    <span class="pool-name" data-i18n="pool.n2o.name">Nitrous Oxide</span>
+                                </div>
+                                <span class="pool-value" id="val-n2o">0</span>
+                            </div>
+                            <div class="pool-bar">
+                                <div class="pool-fill n2o" id="bar-n2o" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <div class="pool-item bad" data-pool="leached" data-i18n-title="pool.clickForInfo" title="Click for info">
+                            <div class="pool-header">
+                                <div class="pool-icon leached-icon"></div>
+                                <div class="pool-info">
+                                    <span class="pool-formula">NO₃⁻↓</span>
+                                    <span class="pool-name" data-i18n="pool.leached.name">Leached</span>
+                                </div>
+                                <span class="pool-value" id="val-leached">0</span>
+                            </div>
+                            <div class="pool-bar">
+                                <div class="pool-fill leached" id="bar-leached" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Environment -->
+                <div class="panel" id="env-panel">
+                    <div class="panel-title" data-i18n="panel.environment">ENVIRONMENT</div>
+                    <div class="env-item">
+                        <span class="env-label" data-i18n="env.moisture">Moisture</span>
+                        <div class="env-bar">
+                            <div class="env-fill moisture" id="moisture-bar" style="width: 50%"></div>
+                        </div>
+                        <span class="env-value" id="moisture-val">50%</span>
+                    </div>
+                    <div class="env-item">
+                        <span class="env-label" data-i18n="env.oxygen">Oxygen</span>
+                        <div class="env-bar">
+                            <div class="env-fill oxygen" id="oxygen-bar" style="width: 60%"></div>
+                        </div>
+                        <span class="env-value" id="oxygen-val">60%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Center - Game Canvas -->
+            <div id="center-panel">
+                <div id="canvas-container">
+                    <canvas id="game-canvas"></canvas>
+                </div>
+
+                <!-- Cycle Diagram (overlay) -->
+                <div id="cycle-diagram" class="hidden">
+                    <button class="close-btn top-close" id="close-diagram-top">✕</button>
+                    <div class="cycle-header">
+                        <div class="cycle-title" data-i18n="cycle.title">⚗ THE NITROGEN CYCLE ⚗</div>
+                        <div class="cycle-subtitle" data-i18n="cycle.subtitle">Click molecules in-game to learn more! (Press ESC to close)</div>
+                    </div>
+
+                    <div class="cycle-canvas">
+                        <!-- SKY ZONE -->
+                        <div class="cycle-zone sky-zone">
+                            <div class="zone-label" data-i18n="cycle.zone.atmo">ATMOSPHERE</div>
+                            <div class="cycle-node n2-node">
+                                <div class="node-icon">N≡N</div>
+                                <div class="node-name">N₂</div>
+                                <div class="node-desc" data-i18n="cycle.n2.desc">Dinitrogen (78% of air)</div>
+                            </div>
+                        </div>
+
+                        <!-- ARROW: Fixation -->
+                        <div class="cycle-arrow-container arrow-down-left">
+                            <div class="arrow-line"></div>
+                            <div class="arrow-head">▼</div>
+                            <div class="arrow-label">
+                                <span class="process-name" data-i18n="cycle.fixation">FIXATION</span>
+                                <span class="bacteria-name">🦠 Rhizobium</span>
+                            </div>
+                        </div>
+
+                        <!-- SOIL ZONE -->
+                        <div class="cycle-zone soil-zone">
+                            <div class="zone-label" data-i18n="cycle.zone.soil">SOIL</div>
+
+                            <!-- Main cycle row -->
+                            <div class="soil-cycle-row">
+                                <div class="cycle-node nh4-node">
+                                    <div class="node-icon">⬥</div>
+                                    <div class="node-name">NH₄⁺</div>
+                                    <div class="node-desc" data-i18n="pool.nh4.name">Ammonium</div>
+                                    <div class="node-tag good" data-i18n="cycle.nh4.tag">Plant food!</div>
+                                </div>
+
+                                <div class="inline-arrow">
+                                    <span class="arrow-symbols">→→→</span>
+                                    <span class="arrow-text">Nitrosomonas</span>
+                                </div>
+
+                                <div class="cycle-node no2-node">
+                                    <div class="node-icon">⬡</div>
+                                    <div class="node-name">NO₂⁻</div>
+                                    <div class="node-desc" data-i18n="pool.no2.name">Nitrite</div>
+                                    <div class="node-tag warning" data-i18n="cycle.no2.tag">⚠ Toxic!</div>
+                                </div>
+
+                                <div class="inline-arrow">
+                                    <span class="arrow-symbols">→→→</span>
+                                    <span class="arrow-text">Nitrobacter</span>
+                                </div>
+
+                                <div class="cycle-node no3-node">
+                                    <div class="node-icon">▲</div>
+                                    <div class="node-name">NO₃⁻</div>
+                                    <div class="node-desc" data-i18n="pool.no3.name">Nitrate</div>
+                                    <div class="node-tag good" data-i18n="cycle.no3.tag">Plant food!</div>
+                                </div>
+                            </div>
+
+                            <!-- Nitrification label -->
+                            <div class="process-label nitrification-label" data-i18n="cycle.nitrification">
+                                ↑ NITRIFICATION (needs O₂) ↑
+                            </div>
+                        </div>
+
+                        <!-- Side processes -->
+                        <div class="side-processes">
+                            <!-- Left side: Organic & Decomposition -->
+                            <div class="side-process left-process">
+                                <div class="cycle-node organic-node">
+                                    <div class="node-icon">🍂</div>
+                                    <div class="node-name" data-i18n="cycle.organic.name">Organic N</div>
+                                    <div class="node-desc" data-i18n="cycle.organic.desc">Dead matter</div>
+                                </div>
+                                <div class="vertical-arrow down">
+                                    <span class="v-arrow-text" data-i18n="cycle.decomposers">Decomposers</span>
+                                    <span>▼</span>
+                                </div>
+                                <div class="decompose-label">→ NH₄⁺</div>
+
+                                <div class="plant-uptake-section">
+                                    <div class="cycle-node plant-node">
+                                        <div class="node-icon">🌱</div>
+                                        <div class="node-name" data-i18n="cycle.plant.name">PLANT</div>
+                                        <div class="node-desc" data-i18n="cycle.plant.desc">Your goal!</div>
+                                        <div class="node-tag plant" data-i18n="cycle.plant.tag">GROW ME!</div>
+                                    </div>
+                                    <div class="uptake-arrows">
+                                        <span class="uptake-label">← NH₄⁺/NO₃⁻</span>
+                                        <span class="uptake-text" data-i18n="cycle.rootUptake">Root uptake</span>
+                                    </div>
+                                </div>
+
+                                <div class="vertical-arrow up">
+                                    <span>▲</span>
+                                    <span class="v-arrow-text" data-i18n="cycle.death">Death</span>
+                                </div>
+                            </div>
+
+                            <!-- Center: Denitrification path -->
+                            <div class="side-process center-process">
+                                <div class="denitrify-section">
+                                    <div class="denitrify-title" data-i18n="cycle.denitrify.title">DENITRIFICATION</div>
+                                    <div class="denitrify-desc" data-i18n="cycle.denitrify.desc">NO₃⁻ → N₂ or N₂O</div>
+                                    <div class="denitrify-bacteria">🦠 Pseudomonas</div>
+                                    <div class="denitrify-condition" data-i18n="cycle.denitrify.condition">(needs LOW O₂)</div>
+                                    <div class="denitrify-arrows">
+                                        <div class="denitrify-path good-path">
+                                            <span class="path-arrow">↗</span>
+                                            <span class="path-label" data-i18n="cycle.denitrify.safe">N₂ (safe)</span>
+                                        </div>
+                                        <div class="denitrify-path bad-path">
+                                            <span class="path-arrow">↗</span>
+                                            <span class="path-label" data-i18n="cycle.denitrify.bad">N₂O (bad!)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right side: Losses -->
+                            <div class="side-process right-process">
+                                <div class="loss-section">
+                                    <div class="loss-title" data-i18n="cycle.losses">⚠ LOSSES ⚠</div>
+
+                                    <div class="loss-item">
+                                        <div class="cycle-node n2o-node small">
+                                            <div class="node-icon">☁</div>
+                                            <div class="node-name">N₂O</div>
+                                            <div class="node-desc" data-i18n="cycle.n2o.desc">Greenhouse gas</div>
+                                            <div class="node-tag bad" data-i18n="cycle.n2o.tag">300x CO₂!</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="loss-item">
+                                        <div class="cycle-node leach-node small">
+                                            <div class="node-icon">💧</div>
+                                            <div class="node-name" data-i18n="cycle.leach.name">Leached</div>
+                                            <div class="node-desc" data-i18n="cycle.leach.desc">NO₃⁻ in water</div>
+                                            <div class="node-tag bad" data-i18n="cycle.leach.tag">Pollution!</div>
+                                        </div>
+                                        <div class="loss-arrow" data-i18n="cycle.leach.arrow">← Heavy rain</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Return arrow to atmosphere -->
+                        <div class="return-arrow-section">
+                            <div class="return-arrow">
+                                <span class="return-line">▲▲▲</span>
+                                <span class="return-label" data-i18n="cycle.returnArrow">N₂ returns to atmosphere</span>
+                            </div>
+                        </div>
+
+                        <!-- Legend -->
+                        <div class="cycle-legend">
+                            <div class="legend-title" data-i18n="cycle.legend.title">KEY BACTERIA</div>
+                            <div class="legend-items">
+                                <div class="legend-item">
+                                    <span class="legend-icon rhizobium">🦠</span>
+                                    <span class="legend-text" data-i18n-html="cycle.legend.rhizobium"><strong>Rhizobium</strong> - Fixes N₂ in root nodules</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-icon nitrosomonas">🦠</span>
+                                    <span class="legend-text" data-i18n-html="cycle.legend.nitrosomonas"><strong>Nitrosomonas</strong> - NH₄⁺ → NO₂⁻</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-icon nitrobacter">🦠</span>
+                                    <span class="legend-text" data-i18n-html="cycle.legend.nitrobacter"><strong>Nitrobacter</strong> - NO₂⁻ → NO₃⁻</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-icon pseudomonas">🦠</span>
+                                    <span class="legend-text" data-i18n-html="cycle.legend.pseudomonas"><strong>Pseudomonas</strong> - Denitrifies NO₃⁻</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tips section -->
+                        <div class="cycle-tips">
+                            <div class="tips-title" data-i18n="cycle.tips.title">🎮 GAMEPLAY TIPS</div>
+                            <div class="tip" data-i18n-html="cycle.tip.fix">⚡ <strong>FIX</strong> - Convert atmospheric N₂ → NH₄⁺ (basic plant food)</div>
+                            <div class="tip" data-i18n-html="cycle.tip.decompose">🍂 <strong>DECOMPOSE</strong> - Break down organic matter → NH₄⁺</div>
+                            <div class="tip" data-i18n-html="cycle.tip.nitrify">⚗ <strong>NITRIFY 1→2</strong> - NH₄⁺ → NO₂⁻ → NO₃⁻. NO₃⁻ gives <strong>+50% FEED BONUS!</strong></div>
+                            <div class="tip" data-i18n-html="cycle.tip.feed">🌱 <strong>FEED</strong> - Give nitrogen to your plant! NO₃⁻ is 50% better than NH₄⁺!</div>
+                            <div class="tip" data-i18n-html="cycle.tip.denitrify">♻ <strong>DENITRIFY</strong> - Reduce NO₃⁻ when high to prevent leaching & toxicity</div>
+                            <div class="tip warning-tip" data-i18n-html="cycle.tip.watch">⚠ <strong>WATCH OUT</strong> - NO₂⁻ is toxic! N₂O is a greenhouse gas! Leaching pollutes water!</div>
+                        </div>
+                    </div>
+
+                    <button class="close-btn" id="close-diagram" data-i18n="cycle.close">✕ CLOSE</button>
+                </div>
+            </div>
+
+            <!-- Right Panel - Plant Status -->
+            <div id="right-panel">
+                <div id="plant-card">
+                    <img id="plant-sprite" src="assets/plants/plant_stage_1.png" data-i18n-alt="plant.alt" alt="Plant">
+                    <div id="plant-stage-name">SEED</div>
+                    <div id="growth-dots">
+                        <div class="growth-dot active" data-i18n-title="plant.dot.seed" title="Seed"></div>
+                        <div class="growth-dot" data-i18n-title="plant.dot.sprout" title="Sprout"></div>
+                        <div class="growth-dot" data-i18n-title="plant.dot.sapling" title="Sapling"></div>
+                        <div class="growth-dot" data-i18n-title="plant.dot.young" title="Young Tree"></div>
+                        <div class="growth-dot" data-i18n-title="plant.dot.tree" title="Tree"></div>
+                    </div>
+                    <div id="plant-n-absorbed"><span data-i18n="plant.nAbsorbed">N absorbed:</span> <span id="n-absorbed-val">0</span></div>
+                </div>
+
+                <div id="health-card" class="panel">
+                    <div class="panel-title" data-i18n="panel.plantHealth">PLANT HEALTH</div>
+                    <div id="health-bar">
+                        <div id="health-fill" style="width: 100%"></div>
+                    </div>
+                    <div id="health-text">100 HP</div>
+                </div>
+
+                <!-- Danger indicators grouped together and higher up -->
+                <div id="danger-indicators">
+                    <div id="atmo-status-card" class="panel danger-card">
+                        <div class="panel-title" data-i18n="panel.atmo">ATMOSPHERE</div>
+                        <div class="status-bar-track atmo">
+                            <div class="status-bar-fill" id="atmo-bar"></div>
+                        </div>
+                        <div class="status-quality" id="atmo-quality">Clean</div>
+                    </div>
+
+                    <div id="water-status-card" class="panel danger-card">
+                        <div class="panel-title" data-i18n="panel.water">WATER</div>
+                        <div class="status-bar-track water">
+                            <div class="status-bar-fill" id="water-bar"></div>
+                        </div>
+                        <div class="status-quality" id="water-quality">Clean</div>
+                    </div>
+                </div>
+
+                <div id="thermometer-card" class="panel">
+                    <div class="panel-title" data-i18n="panel.temperature">TEMPERATURE</div>
+                    <div id="thermometer">
+                        <div id="thermometer-track">
+                            <div id="thermometer-fill" class="normal"></div>
+                        </div>
+                        <div id="thermometer-labels">
+                            <span class="thermo-label extreme">50+</span>
+                            <span class="thermo-label hot">40</span>
+                            <span class="thermo-label warm">30</span>
+                            <span class="thermo-label normal">20</span>
+                        </div>
+                    </div>
+                    <div id="temp-value">20°C</div>
+                </div>
+
+                <button class="info-btn" id="btn-show-cycle" data-i18n="cycle.showBtn">SHOW N-CYCLE</button>
+            </div>
+        </main>
+
+        <!-- Action Panel -->
+        <div id="action-panel">
+            <div id="shop-buttons">
+                <span class="shop-label" data-i18n="shop.label">SHOP</span>
+                <button class="shop-btn" id="btn-clean-water" data-i18n-tooltip="shop.cleanWater.tip" data-tooltip="Reduce leached NO₃⁻ by 40%. Cleans polluted groundwater.">
+                    <span class="shop-cost">$35</span>
+                    <span class="shop-name" data-i18n="shop.cleanWater.name">CLEAN WATER</span>
+                </button>
+                <button class="shop-btn" id="btn-scrub-atmo" data-i18n-tooltip="shop.scrubAtmo.tip" data-tooltip="Reduce N₂O by 40% and cool temperature by 2°C.">
+                    <span class="shop-cost">$40</span>
+                    <span class="shop-name" data-i18n="shop.scrubAtmo.name">SCRUB ATMO</span>
+                </button>
+                <button class="shop-btn" id="btn-plant-tree" data-i18n-tooltip="shop.plantTree.tip" data-tooltip="Plant a companion tree. +10 HP, +15 total nitrogen absorbed.">
+                    <span class="shop-cost">$50</span>
+                    <span class="shop-name" data-i18n="shop.plantTree.name">PLANT TREE</span>
+                </button>
+                <button class="shop-btn" id="btn-emergency-heal" data-i18n-tooltip="shop.heal.tip" data-tooltip="Emergency healing for your plant. +15 HP instantly.">
+                    <span class="shop-cost">$20</span>
+                    <span class="shop-name" data-i18n="shop.heal.name">HEAL</span>
+                </button>
+            </div>
+            <div id="action-buttons">
+                <button class="action-btn" id="btn-fix" data-i18n-tooltip="btn.fix.tip" data-tooltip="N₂ → NH₄⁺ via Rhizobium bacteria. Converts atmospheric nitrogen into plant-usable ammonium.">
+                    <span class="key-hint">1</span>
+                    <span class="btn-formula">N₂→NH₄⁺</span>
+                    <span class="btn-label" data-i18n="btn.fix.label">FIX</span>
+                    <span class="btn-bacteria" data-i18n="btn.fix.bact">Rhizobium</span>
+                    <span class="cd-timer"></span>
+                </button>
+                <button class="action-btn brown" id="btn-decompose" data-i18n-tooltip="btn.decompose.tip" data-tooltip="Organic N → NH₄⁺ via decomposer bacteria. Breaks down dead matter into usable nitrogen.">
+                    <span class="key-hint">2</span>
+                    <span class="btn-formula">Org→NH₄⁺</span>
+                    <span class="btn-label" data-i18n="btn.decompose.label">DECOMPOSE</span>
+                    <span class="btn-bacteria" data-i18n="btn.decompose.bact">Bacteria</span>
+                    <span class="cd-timer"></span>
+                </button>
+                <button class="action-btn orange" id="btn-nitrify1" data-i18n-tooltip="btn.nitrify1.tip" data-tooltip="NH₄⁺ → NO₂⁻ via Nitrosomonas. Step 1 of nitrification. Follow with Nitrify2 to get NO₃⁻ which gives +50% FEED BONUS!">
+                    <span class="key-hint">3</span>
+                    <span class="btn-formula">NH₄⁺→NO₂⁻</span>
+                    <span class="btn-label" data-i18n="btn.nitrify1.label">NITRIFY 1</span>
+                    <span class="btn-bacteria" data-i18n="btn.nitrify1.bact">Nitrosomonas</span>
+                    <span class="cd-timer"></span>
+                </button>
+                <button class="action-btn orange" id="btn-nitrify2" data-i18n-tooltip="btn.nitrify2.tip" data-tooltip="NO₂⁻ → NO₃⁻ via Nitrobacter. Removes TOXIC nitrite! NO₃⁻ gives +50% FEED BONUS vs NH₄⁺!">
+                    <span class="key-hint">4</span>
+                    <span class="btn-formula">NO₂⁻→NO₃⁻</span>
+                    <span class="btn-label" data-i18n="btn.nitrify2.label">NITRIFY 2</span>
+                    <span class="btn-bacteria" data-i18n="btn.nitrify2.bact">Nitrobacter</span>
+                    <span class="cd-timer"></span>
+                </button>
+                <button class="action-btn green" id="btn-feed" data-i18n-tooltip="btn.feed.tip" data-tooltip="Feed nitrogen to your plant! NO₃⁻ gives +50% BONUS absorption. NH₄⁺ is direct but less efficient.">
+                    <span class="key-hint">5</span>
+                    <span class="btn-formula">N→Plant</span>
+                    <span class="btn-label" data-i18n="btn.feed.label">FEED</span>
+                    <span class="btn-bacteria" data-i18n="btn.feed.bact">Root uptake</span>
+                    <span class="cd-timer"></span>
+                </button>
+                <button class="action-btn red" id="btn-denitrify" data-i18n-tooltip="btn.denitrify.tip" data-tooltip="NO₃⁻ → N₂/N₂O via Pseudomonas. PRESSURE VALVE! Use when NO₃⁻ is high to prevent leaching & toxicity. 35% N₂O risk.">
+                    <span class="key-hint">6</span>
+                    <span class="btn-formula">NO₃⁻→N₂</span>
+                    <span class="btn-label" data-i18n="btn.denitrify.label">DENITRIFY</span>
+                    <span class="btn-bacteria" data-i18n="btn.denitrify.bact">Pseudomonas</span>
+                    <span class="cd-timer"></span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Info Popup -->
+        <div id="info-popup" class="hidden">
+            <div class="info-content">
+                <div class="info-formula" id="info-formula">NH₄⁺</div>
+                <div class="info-name" id="info-name">Ammonium</div>
+                <div class="info-desc" id="info-desc">Description here</div>
+                <button class="close-btn" id="close-info" data-i18n="info.ok">OK</button>
+            </div>
+        </div>
+
+        <!-- Tooltip -->
+        <div id="tooltip"></div>
+
+        <!-- Floating Numbers Container -->
+        <div id="floating-nums"></div>
+
+        <!-- Feedback Popup -->
+        <div id="feedback" class="hidden">
+            <span id="feedback-text"></span>
+            <span id="feedback-detail"></span>
+        </div>
+
+        <!-- Tutorial Overlay -->
+        <div id="tutorial-overlay" class="hidden">
+            <div id="tutorial-dialog">
+                <div id="tutorial-text"></div>
+                <div id="tutorial-buttons">
+                    <button id="tutorial-next" class="tutorial-btn" data-i18n="tutorial.next">NEXT</button>
+                    <button id="tutorial-skip" class="tutorial-btn skip" data-i18n="tutorial.skip">SKIP</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pause Overlay -->
+        <div id="pause-overlay" class="hidden">
+            <div id="pause-content">
+                <div id="pause-title" data-i18n="pause.title">❚❚ PAUSED</div>
+                <div id="pause-buttons">
+                    <button class="pause-menu-btn" id="pause-resume" data-i18n="pause.resume">▶ RESUME</button>
+                    <button class="pause-menu-btn" id="pause-save" data-i18n="pause.save">💾 SAVE GAME</button>
+                    <button class="pause-menu-btn" id="pause-load" data-i18n="pause.load">📂 LOAD GAME</button>
+                    <button class="pause-menu-btn" id="pause-help" data-i18n="pause.help">? N-CYCLE HELP</button>
+                    <button class="pause-menu-btn quit" id="pause-quit" data-i18n="pause.quit">✕ QUIT TO MENU</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Over Overlay -->
+        <div id="overlay" class="hidden">
+            <div id="overlay-content">
+                <div id="overlay-title">GAME OVER</div>
+                <div id="overlay-message"></div>
+                <div id="overlay-stats"></div>
+                <button id="btn-restart" data-i18n="over.playAgain">PLAY AGAIN</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/assets.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/nitrogen.js"></script>
+    <script src="js/plant.js"></script>
+    <script src="js/events.js"></script>
+    <script src="js/renderer.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/tutorial.js"></script>
+    <script src="js/achievements.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
