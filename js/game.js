@@ -720,18 +720,29 @@ const Game = {
         const menuHelp = document.getElementById('menu-help');
         const menuLoad = document.getElementById('menu-load');
 
+        // preventDefault + stopPropagation so no parent handler (e.g. the
+        // mobile-drawer "click outside" document listener) can swallow the
+        // click before our handler runs. blur() so pressing Enter/Space
+        // later doesn't re-trigger the button from keyboard focus.
+        const safeHandle = (fn) => (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (e.currentTarget && e.currentTarget.blur) e.currentTarget.blur();
+            fn();
+        };
+
         if (menuHelp) {
-            menuHelp.addEventListener('click', () => {
+            menuHelp.addEventListener('click', safeHandle(() => {
                 Audio.click();
                 UI.showCycleDiagram();
-            });
+            }));
         }
 
         if (menuLoad) {
-            menuLoad.addEventListener('click', () => {
+            menuLoad.addEventListener('click', safeHandle(() => {
                 Audio.click();
                 this.load();
-            });
+            }));
         }
 
         // Add hover sounds
