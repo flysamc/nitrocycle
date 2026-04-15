@@ -1439,6 +1439,7 @@ const Game = {
             oxygen: this.oxygen,
             temperature: this.temperature,
             dayTimer: this.dayTimer,
+            speedMultiplier: this.speedMultiplier || 1,
             lastMilestoneStage: this.lastMilestoneStage,
             dreadState: { ...this.dreadState },
             stats: { ...this.stats },
@@ -1479,6 +1480,12 @@ const Game = {
         this.oxygen = data.oxygen;
         this.temperature = data.temperature;
         this.dayTimer = data.dayTimer || 0;
+        // Speed setting from save — but localStorage preference (set later
+        // by setupSpeedToggle) wins when present, so a returning player
+        // gets the speed they last selected, not the speed they saved at.
+        if (typeof data.speedMultiplier === 'number') {
+            this.speedMultiplier = data.speedMultiplier;
+        }
         this.dayProgress = this.dayTimer / this.dayDuration;
         this.stats = { ...data.stats };
         // Restore milestone + dread state (fall back for older saves without these fields)
