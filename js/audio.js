@@ -437,12 +437,79 @@ const Audio = {
     // Percussion patterns (kick=1, hihat=2, snare=3, 0=rest)
     percPattern: [1, 2, 0, 2, 3, 2, 0, 2, 1, 2, 0, 2, 3, 2, 1, 2],
 
+    // ---- Track 2: Chill ambient (A minor pentatonic, slower) ----
+    musicNotes2: [
+        // Phrase 1 – Floating
+        { note: 220, dur: 0.4 },  // A3
+        { note: 262, dur: 0.3 },  // C4
+        { note: 294, dur: 0.5 },  // D4
+        { note: 262, dur: 0.3 },  // C4
+        { note: 220, dur: 0.6 },  // A3
+        { note: 0, dur: 0.4 },
+        // Phrase 2 – Drift
+        { note: 330, dur: 0.4 },  // E4
+        { note: 294, dur: 0.3 },  // D4
+        { note: 262, dur: 0.5 },  // C4
+        { note: 220, dur: 0.4 },  // A3
+        { note: 196, dur: 0.6 },  // G3
+        { note: 0, dur: 0.5 },
+        // Phrase 3 – Rise
+        { note: 262, dur: 0.3 },  // C4
+        { note: 330, dur: 0.3 },  // E4
+        { note: 392, dur: 0.5 },  // G4
+        { note: 330, dur: 0.4 },  // E4
+        { note: 262, dur: 0.5 },  // C4
+        { note: 0, dur: 0.5 },
+        // Phrase 4 – Resolve
+        { note: 294, dur: 0.3 },  // D4
+        { note: 262, dur: 0.3 },  // C4
+        { note: 220, dur: 0.5 },  // A3
+        { note: 196, dur: 0.4 },  // G3
+        { note: 220, dur: 0.8 },  // A3
+        { note: 0, dur: 0.6 },
+    ],
+    bassNotes2: [
+        { note: 110, dur: 1.0 },  // A2
+        { note: 110, dur: 1.0 },
+        { note: 131, dur: 1.0 },  // C3
+        { note: 110, dur: 1.0 },
+        { note: 98, dur: 1.0 },   // G2
+        { note: 110, dur: 1.0 },
+        { note: 131, dur: 1.0 },  // C3
+        { note: 98, dur: 1.0 },   // G2
+    ],
+    arpeggioPatterns2: [
+        [220, 262, 330],   // A minor
+        [220, 262, 330],
+        [262, 330, 392],   // C major
+        [220, 262, 330],
+        [196, 247, 294],   // G major
+        [220, 262, 330],
+        [262, 330, 392],   // C major
+        [196, 247, 294],   // G major
+    ],
+    // Lighter percussion for chill track
+    percPattern2: [1, 0, 2, 0, 0, 2, 0, 0, 1, 0, 2, 0, 0, 2, 0, 0],
+
+    // Track selection: 0 = track 1 (upbeat), 1 = track 2 (chill)
+    currentTrack: 0,
+
     // Tension tracking for music intensity
     musicTension: 0,  // 0-1, set by game state
 
     startMusic() {
         if (!this.musicEnabled || this.musicInterval) return;
         this.ensureContext();
+
+        // Select track data
+        const isChill = this.currentTrack === 1;
+        const melody  = isChill ? this.musicNotes2 : this.musicNotes;
+        const bass    = isChill ? this.bassNotes2 : this.bassNotes;
+        const arps    = isChill ? this.arpeggioPatterns2 : this.arpeggioPatterns;
+        const percs   = isChill ? this.percPattern2 : this.percPattern;
+        const tempo   = isChill ? 250 : 200;
+        const melodyWave = isChill ? 'sine' : 'square';
+        const percVol = isChill ? 0.5 : 1.0;
 
         this.currentNote = 0;
         let bassNote = 0;
@@ -457,58 +524,53 @@ const Audio = {
             }
 
             // Play melody note
-            const melodyNote = this.musicNotes[this.currentNote];
+            const melodyNote = melody[this.currentNote];
             if (melodyNote.note > 0) {
-                this.playMusicNote(melodyNote.note, melodyNote.dur * 0.9, 'square');
+                this.playMusicNote(melodyNote.note, melodyNote.dur * 0.9, melodyWave);
             }
 
             // Play bass on every 4th beat
             if (beatCount % 4 === 0) {
-                const bass = this.bassNotes[bassNote % this.bassNotes.length];
-                this.playMusicNote(bass.note, 0.3, 'triangle', 0.7);
+                const b = bass[bassNote % bass.length];
+                this.playMusicNote(b.note, 0.3, 'triangle', 0.7);
                 bassNote++;
             }
 
             // Arpeggio on every 2nd beat (subtle sparkle)
             if (beatCount % 2 === 1) {
-                const arpChord = this.arpeggioPatterns[arpNote % this.arpeggioPatterns.length];
+                const arpChord = arps[arpNote % arps.length];
                 const arpIdx = beatCount % 3;
                 if (arpChord[arpIdx]) {
-                    // Play arpeggio note one octave up, quieter
                     this.playMusicNote(arpChord[arpIdx] * 2, 0.1, 'sine', 0.3);
                 }
                 if (beatCount % 8 === 1) arpNote++;
             }
 
             // Percussion
-            const perc = this.percPattern[percBeat % this.percPattern.length];
+            const perc = percs[percBeat % percs.length];
             if (perc === 1) {
-                // Kick - low thud
-                this.playMusicNote(60, 0.08, 'sine', 0.5);
+                this.playMusicNote(60, 0.08, 'sine', 0.5 * percVol);
             } else if (perc === 2) {
-                // Hi-hat - noise tick
-                this.playPercHit(0.03, 0.2);
+                this.playPercHit(0.03, 0.2 * percVol);
             } else if (perc === 3) {
-                // Snare - noise + tone
-                this.playPercHit(0.06, 0.35);
-                this.playMusicNote(180, 0.04, 'square', 0.2);
+                this.playPercHit(0.06, 0.35 * percVol);
+                this.playMusicNote(180, 0.04, 'square', 0.2 * percVol);
             }
             percBeat++;
 
             // Tension layer: when danger is high, add dissonant undertone
             if (this.musicTension > 0.3 && beatCount % 8 === 0) {
-                const tensionFreq = 165 + this.musicTension * 50; // E3 area, rises with tension
+                const tensionFreq = 165 + this.musicTension * 50;
                 this.playMusicNote(tensionFreq, 0.6, 'sawtooth', 0.15 * this.musicTension);
-                // Tritone interval for unease
                 if (this.musicTension > 0.6) {
                     this.playMusicNote(tensionFreq * 1.414, 0.4, 'sawtooth', 0.1 * this.musicTension);
                 }
             }
 
             beatCount++;
-            this.currentNote = (this.currentNote + 1) % this.musicNotes.length;
+            this.currentNote = (this.currentNote + 1) % melody.length;
 
-        }, 200); // Tempo
+        }, tempo);
     },
 
     // Percussion noise hit
@@ -566,12 +628,23 @@ const Audio = {
         this.musicTension = Math.max(0, Math.min(1, level));
     },
 
+    // Cycle: Off → Track 1 (upbeat) → Track 2 (chill) → Off
     toggleMusic() {
-        this.musicEnabled = !this.musicEnabled;
-        if (this.musicEnabled) {
+        if (!this.musicEnabled) {
+            // Off → Track 1
+            this.musicEnabled = true;
+            this.currentTrack = 0;
+            this.startMusic();
+        } else if (this.currentTrack === 0) {
+            // Track 1 → Track 2
+            this.stopMusic();
+            this.currentTrack = 1;
             this.startMusic();
         } else {
+            // Track 2 → Off
+            this.musicEnabled = false;
             this.stopMusic();
+            this.currentTrack = 0;
         }
         return this.musicEnabled;
     },

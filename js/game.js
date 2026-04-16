@@ -204,10 +204,23 @@ const Game = {
 
         if (btnMusic) {
             btnMusic.addEventListener('click', () => {
-                const enabled = Audio.toggleMusic();
-                btnMusic.classList.toggle('off', !enabled);
+                Audio.toggleMusic();
+                this._refreshMusicBtn(btnMusic);
                 Audio.click();
             });
+        }
+    },
+
+    _refreshMusicBtn(btn) {
+        if (!btn) return;
+        if (!Audio.musicEnabled) {
+            btn.classList.add('off');
+            btn.textContent = '\uD83D\uDD07';
+        } else {
+            btn.classList.remove('off');
+            btn.textContent = Audio.currentTrack === 0
+                ? '\uD83D\uDD0A'
+                : '\uD83C\uDFB5';
         }
     },
 
@@ -356,9 +369,8 @@ const Game = {
                     break;
                 case 'm':
                     e.preventDefault();
-                    const musicEnabled = Audio.toggleMusic();
-                    const btnMusic = document.getElementById('btn-music');
-                    if (btnMusic) btnMusic.classList.toggle('off', !musicEnabled);
+                    Audio.toggleMusic();
+                    this._refreshMusicBtn(document.getElementById('btn-music'));
                     Audio.click();
                     break;
                 case 'n':

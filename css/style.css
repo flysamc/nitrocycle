@@ -403,6 +403,33 @@ body {
     color: var(--pixel-red);
 }
 
+/* ========== LOGO BAR ========== */
+.logo-bar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    margin-top: 16px;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 4px;
+}
+.partner-logo {
+    height: 40px;
+    width: auto;
+    opacity: 0.85;
+    transition: opacity 0.2s, transform 0.2s;
+    filter: brightness(1.1);
+}
+.partner-logo:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+@media (max-width: 480px) {
+    .logo-bar { gap: 14px; padding: 8px 10px; }
+    .partner-logo { height: 28px; }
+}
+
 /* ========== CREDITS LINE ========== */
 .credits {
     font-family: 'Press Start 2P', monospace;
