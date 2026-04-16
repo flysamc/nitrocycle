@@ -391,7 +391,7 @@ const Game = {
     setupSpeedToggle() {
         // Load saved preference
         const saved = parseFloat(localStorage.getItem('nitrocycle_speed'));
-        if (saved === 0.5 || saved === 1 || saved === 2) {
+        if (saved === 0.25 || saved === 0.5 || saved === 1 || saved === 2) {
             this.speedMultiplier = saved;
         }
         // Reflect on UI
@@ -402,7 +402,7 @@ const Game = {
                 e.preventDefault();
                 e.stopPropagation();
                 const v = parseFloat(btn.getAttribute('data-speed'));
-                if (v === 0.5 || v === 1 || v === 2) {
+                if (v === 0.25 || v === 0.5 || v === 1 || v === 2) {
                     this.speedMultiplier = v;
                     localStorage.setItem('nitrocycle_speed', String(v));
                     this._refreshSpeedUI();
@@ -1523,7 +1523,7 @@ const Game = {
         // against the same {0.5, 1, 2} whitelist used by setupSpeedToggle
         // so a corrupt save can't leave us at an unrepresentable speed.
         if (localStorage.getItem('nitrocycle_speed') === null
-            && (data.speedMultiplier === 0.5 || data.speedMultiplier === 1 || data.speedMultiplier === 2)) {
+            && (data.speedMultiplier === 0.25 || data.speedMultiplier === 0.5 || data.speedMultiplier === 1 || data.speedMultiplier === 2)) {
             this.speedMultiplier = data.speedMultiplier;
         }
         // Whichever rule won, the pill UI must reflect it.
