@@ -174,10 +174,15 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
     }
 
-    # Cache static assets
-    location ~* \.(js|css|png|jpg|gif|ico|svg)$ {
+    # Cache static assets – images are safe to cache long; JS/CSS use
+    # short max-age + revalidate so deploys are picked up quickly.
+    location ~* \.(png|jpg|gif|ico|svg)$ {
         expires 7d;
         add_header Cache-Control "public, immutable";
+    }
+    location ~* \.(js|css)$ {
+        expires 1h;
+        add_header Cache-Control "public, must-revalidate";
     }
 }
 NGINXEOF
