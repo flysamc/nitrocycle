@@ -47,7 +47,7 @@ const Leaderboard = {
         return res.json();
     },
 
-    async submit({ name, score, days, difficulty }) {
+    async submit({ name, score, days, difficulty, won }) {
         const url = `${this.API}?difficulty=${encodeURIComponent(difficulty)}`;
         let res;
         try {
@@ -57,7 +57,7 @@ const Leaderboard = {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json'
                 },
-                body: JSON.stringify({ name, score, days })
+                body: JSON.stringify({ name, score, days, won: !!won })
             });
         } catch (e) {
             const err = new Error('Leaderboard offline');

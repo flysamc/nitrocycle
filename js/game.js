@@ -535,17 +535,21 @@ const Game = {
             if (entries.length === 0) {
                 status.textContent = t('lb.empty');
             } else {
+                const medals = ['\u{1F947}', '\u{1F948}', '\u{1F949}']; // gold, silver, bronze
                 entries.forEach((e, i) => {
                     const tr = document.createElement('tr');
                     if (highlightTimestamp && e.timestamp === highlightTimestamp) {
                         tr.classList.add('you');
                     }
+                    if (e.won) tr.classList.add('lb-winner');
                     const escape = (s) => String(s).replace(/[&<>"']/g, c => (
                         { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]
                     ));
+                    const medal = i < 3 ? medals[i] : '';
+                    const wonBadge = e.won ? ' <span class="lb-won-badge" title="Winner">\u{1F333}</span>' : '';
                     tr.innerHTML =
-                        `<td class="lb-col-rank">${i + 1}</td>` +
-                        `<td class="lb-col-name">${escape(e.name)}</td>` +
+                        `<td class="lb-col-rank">${medal || (i + 1)}</td>` +
+                        `<td class="lb-col-name">${escape(e.name)}${wonBadge}</td>` +
                         `<td class="lb-col-score">${e.score}</td>` +
                         `<td class="lb-col-days">${e.days}</td>`;
                     tbody.appendChild(tr);
@@ -634,7 +638,8 @@ const Game = {
                 name,
                 score: this.score,
                 days: this.day,
-                difficulty: this.difficulty || 'normal'
+                difficulty: this.difficulty || 'normal',
+                won: this.state === 'won'
             });
             Audio.goodEvent();
             this.closeNameModal();

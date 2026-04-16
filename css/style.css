@@ -2127,9 +2127,19 @@ body {
 }
 .lb-table tbody tr.you td { color: var(--pixel-yellow); }
 
-.lb-table tbody tr:nth-child(1) td.lb-col-rank { color: #ffd700; }
-.lb-table tbody tr:nth-child(2) td.lb-col-rank { color: #c0c0c0; }
-.lb-table tbody tr:nth-child(3) td.lb-col-rank { color: #cd7f32; }
+.lb-table tbody tr:nth-child(1) td.lb-col-rank { color: #ffd700; font-size: 14px; }
+.lb-table tbody tr:nth-child(2) td.lb-col-rank { color: #c0c0c0; font-size: 14px; }
+.lb-table tbody tr:nth-child(3) td.lb-col-rank { color: #cd7f32; font-size: 14px; }
+
+/* Winner rows get a subtle green tint */
+.lb-table tbody tr.lb-winner {
+    background: rgba(56, 183, 100, 0.10);
+}
+.lb-won-badge {
+    font-size: 10px;
+    margin-left: 3px;
+    vertical-align: middle;
+}
 
 #overlay-actions {
     display: flex;

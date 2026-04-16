@@ -85,10 +85,13 @@ export default async (request, context) => {
             return jsonResponse({ error: "Invalid days" }, 400);
         }
 
+        const won = Boolean(body.won);
+
         const entry = {
             name,
             score: Math.floor(score),
             days: Math.floor(days),
+            won,
             difficulty: diff,
             timestamp: Date.now()
         };
@@ -96,8 +99,12 @@ export default async (request, context) => {
         const existing = (await store.get(key, { type: "json" })) || [];
         existing.push(entry);
 
-        // Sort: higher score wins, fewer days breaks ties, earlier timestamp last
+        // Sort: winners first, then higher score, fewer days breaks ties,
+        // earlier timestamp last.
         existing.sort((a, b) => {
+            const aWon = a.won ? 1 : 0;
+            const bWon = b.won ? 1 : 0;
+            if (bWon !== aWon) return bWon - aWon;
             if (b.score !== a.score) return b.score - a.score;
             if (a.days !== b.days) return a.days - b.days;
             return a.timestamp - b.timestamp;

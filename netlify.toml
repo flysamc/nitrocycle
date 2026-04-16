@@ -1,0 +1,8 @@
+[build]
+  # Static site — just install deps so the Netlify Function can use @netlify/blobs
+  command = "npm install"
+  publish = "."
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
