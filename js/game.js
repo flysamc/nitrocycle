@@ -135,6 +135,8 @@ const Game = {
     showDifficultySelect() {
         const el = document.getElementById('difficulty-select');
         if (el) el.classList.remove('hidden');
+        // Sync menu music button state
+        this._refreshMenuMusicBtn(document.getElementById('menu-music'));
     },
 
     hideDifficultySelect() {
@@ -877,10 +879,35 @@ const Game = {
             }));
         }
 
+        // Menu music toggle
+        const menuMusic = document.getElementById('menu-music');
+        if (menuMusic) {
+            menuMusic.addEventListener('click', safeHandle(() => {
+                Audio.toggleMusic();
+                this._refreshMenuMusicBtn(menuMusic);
+                // Also sync the in-game header button
+                this._refreshMusicBtn(document.getElementById('btn-music'));
+                Audio.click();
+            }));
+            // Set initial state
+            this._refreshMenuMusicBtn(menuMusic);
+        }
+
         // Add hover sounds
         document.querySelectorAll('.diff-action-btn').forEach(btn => {
             btn.addEventListener('mouseenter', () => Audio.hover());
         });
+    },
+
+    _refreshMenuMusicBtn(btn) {
+        if (!btn) return;
+        if (!Audio.musicEnabled) {
+            btn.textContent = '\uD83D\uDD07 Music Off';
+        } else {
+            btn.textContent = Audio.currentTrack === 0
+                ? '\uD83D\uDD0A Music 1'
+                : '\uD83C\uDFB5 Music 2';
+        }
     },
 
     doShop(action) {
