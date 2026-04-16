@@ -113,7 +113,22 @@ const Nitrogen = {
         }
     },
 
+    // Cumulative N₂O produced across all sources (fixation byproduct,
+    // passive denitrification, events, manual denitrify).  Reset on init().
+    totalN2oProduced: 0,
+
+    /** Add N₂O to the pool and track the cumulative total for scoring. */
+    addN2o(amount) {
+        this.pools.n2o += amount;
+        this.totalN2oProduced += amount;
+        // Funny commentary on large spikes
+        if (amount >= 5 && window.UI) {
+            UI.showCommentary('quip.n2oSpike', 'bad');
+        }
+    },
+
     init() {
+        this.totalN2oProduced = 0;
         this.pools = {
             n2: 250,       // Atmosphere is always full
             nh4: 20,       // Start with more ammonium
@@ -152,7 +167,7 @@ const Nitrogen = {
         let n2oByproduct = 0;
         if (Math.random() < 0.3) {
             n2oByproduct = Math.floor(amount * 0.25);
-            this.pools.n2o += n2oByproduct;
+            this.addN2o(n2oByproduct);
         }
 
         const nh4Produced = amount - n2oByproduct;
@@ -343,7 +358,7 @@ const Nitrogen = {
         const wasEmergency = no3Level > 60;
 
         if (Math.random() < n2oChance) {
-            this.pools.n2o += amount;
+            this.addN2o(amount);
             return {
                 success: true,
                 amount: amount,
@@ -501,7 +516,7 @@ const Nitrogen = {
             if (oxygen < 45 && Math.random() < 0.4) {
                 // Low oxygen: some NO2 becomes N2O (bad!)
                 const n2oPart = Math.floor(convert * 0.30);
-                this.pools.n2o += n2oPart;
+                this.addN2o(n2oPart);
                 this.pools.no3 += convert - n2oPart;
                 if (n2oPart > 0) {
                     results.push({ message: _t('turn.lowO2N2o', { amount: n2oPart }), type: 'bad' });
@@ -536,7 +551,7 @@ const Nitrogen = {
                 // Lower oxygen = more incomplete denitrification = more N2O
                 const n2oChance = (30 - oxygen) / 40;
                 if (Math.random() < n2oChance) {
-                    this.pools.n2o += denitrify;
+                    this.addN2o(denitrify);
                     results.push({ message: _t('turn.anaerobicN2o', { amount: denitrify }), type: 'bad' });
                 } else {
                     this.pools.n2 += denitrify;

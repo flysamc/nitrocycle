@@ -63,7 +63,7 @@ const Events = {
             chance: 0.10,
             effect: (nitrogen, plant) => {
                 const n2oSpike = 8 + Math.floor(Math.random() * 8);
-                nitrogen.pools.n2o += n2oSpike;
+                nitrogen.addN2o(n2oSpike);
                 return { msgKey: 'event.heatwave.msg', msgVars: { amount: n2oSpike }, type: 'bad', heatwave: true };
             }
         },
@@ -103,7 +103,7 @@ const Events = {
             effect: (nitrogen, plant) => {
                 const n2o = Math.floor(nitrogen.pools.no3 * 0.20);
                 nitrogen.pools.no3 -= n2o;
-                nitrogen.pools.n2o += n2o;
+                nitrogen.addN2o(n2o);
                 return { msgKey: 'event.badBacteria.msg', msgVars: { amount: n2o }, type: 'bad' };
             }
         },

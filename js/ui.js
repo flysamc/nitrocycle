@@ -573,6 +573,51 @@ const UI = {
         setTimeout(() => {
             if (el.parentNode) el.parentNode.removeChild(el);
         }, 1500);
+    },
+    // ========== COMMENTARY TOAST (funny quips) ==========
+    _commentaryEl: null,
+    _commentaryTimer: null,
+    _commentaryLastTime: 0,
+    _commentaryLastKey: '',
+    _commentaryCooldown: 15000, // 15s between quips
+
+    showCommentary(quipKey, type = 'warning') {
+        const now = Date.now();
+        if (now - this._commentaryLastTime < this._commentaryCooldown) return;
+
+        const tr = (typeof window.t === 'function') ? window.t : (k) => k;
+        const raw = tr(quipKey);
+        if (!raw || raw === quipKey) return; // missing key
+
+        const options = raw.split('|');
+        // Avoid repeating the same quip
+        let pick;
+        if (options.length > 1) {
+            const filtered = options.filter((_, i) => `${quipKey}:${i}` !== this._commentaryLastKey);
+            const chosen = filtered.length > 0 ? filtered : options;
+            pick = chosen[Math.floor(Math.random() * chosen.length)];
+            this._commentaryLastKey = `${quipKey}:${options.indexOf(pick)}`;
+        } else {
+            pick = options[0];
+            this._commentaryLastKey = quipKey;
+        }
+
+        if (!this._commentaryEl) {
+            this._commentaryEl = document.getElementById('commentary-toast');
+        }
+        if (!this._commentaryEl) return;
+
+        // Clear any pending hide
+        if (this._commentaryTimer) clearTimeout(this._commentaryTimer);
+
+        this._commentaryEl.textContent = pick;
+        this._commentaryEl.className = `${type} show`;
+        this._commentaryLastTime = now;
+
+        this._commentaryTimer = setTimeout(() => {
+            this._commentaryEl.classList.remove('show');
+            this._commentaryTimer = null;
+        }, 4000);
     }
 };
 

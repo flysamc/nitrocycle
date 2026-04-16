@@ -64,7 +64,6 @@ const Game = {
         fed: 0,
         nitrified: 0,
         denitrified: 0,
-        n2oProduced: 0,
         leached: 0
     },
 
@@ -1113,7 +1112,6 @@ const Game = {
                     this.money += 1;
                     Renderer.triggerTransformation('denitrify');
                     if (result.to === 'n2o') {
-                        this.stats.n2oProduced += result.amount;
                         this.score -= 5;
                         Audio.badEvent();
                         UI.showFloatingNumber(t('float.plusN2o', { amount: result.amount }), 'bad');
@@ -1252,6 +1250,15 @@ const Game = {
         // Bumped from +$3 → +$4 to reduce mid-game money pressure (rebalance design 2026-04-15)
         this.money += 4;
 
+        // Funny commentary for high temperature
+        if (this.temperature > 40) {
+            UI.showCommentary('quip.tempHigh', 'warning');
+        }
+        // Funny commentary for dying plant
+        if (Plant.health > 0 && Plant.health < 30) {
+            UI.showCommentary('quip.plantDying', 'bad');
+        }
+
         UI.addLog(t('log.newDay', { day: this.day }));
         this.updateUI();
 
@@ -1285,6 +1292,10 @@ const Game = {
             } else {
                 Audio.stopAtmoDread();
             }
+            // Funny commentary on escalation
+            if (atmoLevel > this.dreadState.atmosphereLevel) {
+                UI.showCommentary(atmoLevel === 2 ? 'quip.atmoCritical' : 'quip.atmoWarning', 'bad');
+            }
             this.dreadState.atmosphereLevel = atmoLevel;
         }
 
@@ -1301,6 +1312,10 @@ const Game = {
                 Audio.startWaterDread(waterLevel);
             } else {
                 Audio.stopWaterDread();
+            }
+            // Funny commentary on escalation
+            if (waterLevel > this.dreadState.waterLevel) {
+                UI.showCommentary(waterLevel === 2 ? 'quip.waterCritical' : 'quip.waterWarning', 'bad');
             }
             this.dreadState.waterLevel = waterLevel;
         }
@@ -1370,7 +1385,7 @@ const Game = {
             this.score += 200;
 
             // Bonus for minimal pollution
-            if (this.stats.n2oProduced < 10) {
+            if (Nitrogen.totalN2oProduced < 10) {
                 this.score += 50;
                 UI.addLog(t('log.bonusLowGhg'), 'good');
             }
@@ -1387,7 +1402,7 @@ const Game = {
                 score: this.score,
                 fixed: this.stats.fixed,
                 fed: this.stats.fed,
-                n2o: this.stats.n2oProduced,
+                n2o: Nitrogen.totalN2oProduced,
                 leached: this.stats.leached
             });
             // Win → offer to save score
@@ -1402,7 +1417,7 @@ const Game = {
                 score: this.score,
                 fixed: this.stats.fixed,
                 fed: this.stats.fed,
-                n2o: this.stats.n2oProduced,
+                n2o: Nitrogen.totalN2oProduced,
                 leached: this.stats.leached
             });
             // Loss → don't offer score saving
@@ -1426,7 +1441,6 @@ const Game = {
             fed: 0,
             nitrified: 0,
             denitrified: 0,
-            n2oProduced: 0,
             leached: 0
         };
 
