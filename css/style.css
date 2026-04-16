@@ -2614,8 +2614,8 @@ body {
 }
 @media (max-width: 480px) {
     #commentary-toast {
-        max-width: 200px;
-        font-size: 6px;
+        max-width: 220px;
+        font-size: 7px;
         padding: 8px 10px;
         bottom: 60px;
     }

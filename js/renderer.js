@@ -323,7 +323,7 @@ const Renderer = {
                     if (window.UI && UI.showFloatingNumber) {
                         const tr = (typeof window.t === 'function') ? window.t : (k, v) => `+${v.amount} organic`;
                         UI.showFloatingNumber(tr('farm.manure.float', { amount: add }), 'good');
-                        UI.showCommentary('quip.manure', 'good');
+                        if (Math.random() < 0.25) UI.showCommentary('quip.manure', 'good');
                     }
                     // Each manure pile also drops a single coin — light passive
                     // income to ease money pressure without trivializing the

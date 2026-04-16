@@ -1168,6 +1168,13 @@ const Game = {
             UI.showFeedback(event.name, event.result.message, 2000);
             UI.showFloatingNumber(event.name, event.result.type === 'good' ? 'good' : event.result.type === 'bad' ? 'bad' : 'neutral');
 
+            // Commentary for bad events
+            if (event.id === 'HEATWAVE')       UI.showCommentary('quip.tempHigh', 'warning');
+            else if (event.id === 'BAD BACTERIA') UI.showCommentary('quip.n2oSpike', 'bad');
+            else if (event.id === 'HEAVY RAIN')  UI.showCommentary('quip.waterWarning', 'warning');
+            else if (event.id === 'DROUGHT')     UI.showCommentary('quip.plantDying', 'warning');
+            else if (event.id === 'PEST ATTACK') UI.showCommentary('quip.plantDying', 'bad');
+
             // Update environment based on events
             if (event.id === 'HEAVY RAIN') {
                 this.moisture = Math.min(95, this.moisture + 30);
@@ -1250,14 +1257,9 @@ const Game = {
         // Bumped from +$3 → +$4 to reduce mid-game money pressure (rebalance design 2026-04-15)
         this.money += 4;
 
-        // Funny commentary for high temperature
-        if (this.temperature > 40) {
-            UI.showCommentary('quip.tempHigh', 'warning');
-        }
-        // Funny commentary for dying plant
-        if (Plant.health > 0 && Plant.health < 30) {
-            UI.showCommentary('quip.plantDying', 'bad');
-        }
+        // Smart commentary: pick the most relevant quip based on current
+        // game state. Priority order ensures the worst problem gets narrated.
+        this._pickDailyCommentary();
 
         UI.addLog(t('log.newDay', { day: this.day }));
         this.updateUI();
@@ -1271,6 +1273,45 @@ const Game = {
         }
 
         this.checkWinLose();
+    },
+
+    // Pick a relevant quip based on current game state each day.
+    // Builds a weighted list of applicable quips and picks one randomly,
+    // biased toward the most severe problem.
+    _pickDailyCommentary() {
+        const n2o = Nitrogen.pools.n2o || 0;
+        const leached = Nitrogen.pools.leached || 0;
+        const hp = Plant.health;
+        const temp = this.temperature;
+
+        // Collect candidates: [quipKey, type, weight]
+        const candidates = [];
+
+        if (n2o > 35 || temp > 45)       candidates.push(['quip.atmoCritical', 'bad', 5]);
+        else if (n2o > 15 || temp > 30)  candidates.push(['quip.atmoWarning', 'warning', 3]);
+
+        if (leached > 60)                candidates.push(['quip.waterCritical', 'bad', 5]);
+        else if (leached > 30)           candidates.push(['quip.waterWarning', 'warning', 3]);
+
+        if (hp > 0 && hp < 30)           candidates.push(['quip.plantDying', 'bad', 4]);
+
+        if (temp > 40)                   candidates.push(['quip.tempHigh', 'warning', 3]);
+
+        if (candidates.length === 0) return;
+
+        // Weighted random pick
+        const totalWeight = candidates.reduce((s, c) => s + c[2], 0);
+        let roll = Math.random() * totalWeight;
+        for (const [key, type, weight] of candidates) {
+            roll -= weight;
+            if (roll <= 0) {
+                UI.showCommentary(key, type);
+                return;
+            }
+        }
+        // fallback
+        const last = candidates[candidates.length - 1];
+        UI.showCommentary(last[0], last[1]);
     },
 
     checkDreadSounds() {

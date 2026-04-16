@@ -575,22 +575,39 @@ const UI = {
         }, 1500);
     },
     // ========== COMMENTARY TOAST (funny quips) ==========
+    // Priority system: urgent quips (bad/warning) can preempt low-priority
+    // ones (good). Per-category cooldowns prevent the same trigger from
+    // spamming, while a short global cooldown keeps the UI readable.
     _commentaryEl: null,
     _commentaryTimer: null,
-    _commentaryLastTime: 0,
-    _commentaryLastKey: '',
-    _commentaryCooldown: 15000, // 15s between quips
+    _commentaryLastTime: 0,        // global cooldown timestamp
+    _commentaryLastKey: '',         // last picked quip index
+    _commentaryLastType: '',        // priority of currently showing toast
+    _commentaryCategoryCDs: {},     // per-category cooldown timestamps
+    _commentaryGlobalCD: 5000,      // 5s min between any quips
+    _commentaryCategoryCD: 20000,   // 20s before same category repeats
 
     showCommentary(quipKey, type = 'warning') {
         const now = Date.now();
-        if (now - this._commentaryLastTime < this._commentaryCooldown) return;
+
+        // Per-category cooldown: same trigger can't repeat within 30s
+        const catLast = this._commentaryCategoryCDs[quipKey] || 0;
+        if (now - catLast < this._commentaryCategoryCD) return;
+
+        // Global cooldown: 5s between any quips, but urgent (bad/warning)
+        // can interrupt a currently-showing low-priority (good) toast
+        const elapsed = now - this._commentaryLastTime;
+        if (elapsed < this._commentaryGlobalCD) {
+            const isUrgent = type === 'bad' || type === 'warning';
+            const prevIsLow = this._commentaryLastType === 'good';
+            if (!(isUrgent && prevIsLow)) return;
+        }
 
         const tr = (typeof window.t === 'function') ? window.t : (k) => k;
         const raw = tr(quipKey);
-        if (!raw || raw === quipKey) return; // missing key
+        if (!raw || raw === quipKey) return;
 
         const options = raw.split('|');
-        // Avoid repeating the same quip
         let pick;
         if (options.length > 1) {
             const filtered = options.filter((_, i) => `${quipKey}:${i}` !== this._commentaryLastKey);
@@ -607,12 +624,13 @@ const UI = {
         }
         if (!this._commentaryEl) return;
 
-        // Clear any pending hide
         if (this._commentaryTimer) clearTimeout(this._commentaryTimer);
 
         this._commentaryEl.textContent = pick;
         this._commentaryEl.className = `${type} show`;
         this._commentaryLastTime = now;
+        this._commentaryLastType = type;
+        this._commentaryCategoryCDs[quipKey] = now;
 
         this._commentaryTimer = setTimeout(() => {
             this._commentaryEl.classList.remove('show');
